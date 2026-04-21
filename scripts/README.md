@@ -38,6 +38,7 @@ node cache-read-weight-transition.mjs
 node thinking-token-estimation.mjs
 node iterations-window-correlation.mjs
 node quota-composition-breakdown.mjs
+node opus-47-comparison.mjs
 ```
 
 Each script is standalone — no shared module — so you can run one without pulling the others.
@@ -51,12 +52,17 @@ Each script is standalone — no shared module — so you can run one without pu
 | `thinking-token-estimation.mjs` | How big is the gap between reported `output_tokens` and the visible content we can see in JSONL? Bounds the hidden thinking-token contribution. Includes a sensitivity pass comparing a fixed-80 vs per-block JSON-size tool_use estimate. |
 | `iterations-window-correlation.mjs` | Do calls with the `usage.iterations` field correlate with the 5-hour windows that push utilization toward rate-limit territory? |
 | `quota-composition-breakdown.mjs` | Monthly breakdown of input / output / cache_read / cache_write under both quota formulas, with ArkNill's per-1% benchmarks. |
+| `opus-47-comparison.mjs` | Opus 4.7 vs 4.6 per-call token multipliers and 5h window utilization. Tests the tokenizer-inflation and Q5h-burn claims from `16_OPUS-47-ADVISORY.md`. Small sample on 4.7 side; see sample-output for caveats. |
 
 ## `sample-output/`
 
 Captured stdout from running each script against our 178K-call, 5,605-file dataset (Dec 23 2025 – Apr 11 2026). Read these if you don't have the raw logs.
 
 ## Changelog
+
+### v2.1 (2026-04-21) — Opus 4.7 comparison added
+
+- `opus-47-comparison.mjs` — partitions calls by model, compares 4.6 vs 4.7 on per-call token averages, quota-per-call, iter share, and 5h window utilization. Built to test claims from `16_OPUS-47-ADVISORY.md` against client-side JSONL data. Early-window: n=2,615 on 4.7 side, directional only.
 
 ### v2 (2026-04-21) — ArkNill review response
 

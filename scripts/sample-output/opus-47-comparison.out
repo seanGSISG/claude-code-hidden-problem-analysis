@@ -1,0 +1,64 @@
+═══════════════════════════════════════════════════════════════════════════
+  OPUS 4.7 vs 4.6 COMPARISON (our 215K-call dataset)
+═══════════════════════════════════════════════════════════════════════════
+
+  4.7 window: 2026-04-16+ (claude-opus-4-7)
+  4.6 window: 2026-04-02 to 2026-04-15 (claude-opus-4-6)
+  Testing: tokenizer inflation, Q5h burn multiplier, iter share
+
+── SECTION 1: PER-CALL AVERAGES ────────────────────────────────────────
+
+  Metric              |   Opus 4.6   |   Opus 4.7   | 4.7 / 4.6
+  --------------------|--------------|--------------|----------
+                Calls |        32299 |         2615 |     0.08x
+     Avg input tokens |           40 |            4 |     0.10x
+    Avg output tokens |          413 |         1079 |     2.61x
+  Avg cache_read tokens |       103632 |       124086 |     1.20x
+  Avg cache_create tokens |         5046 |         6894 |     1.37x
+          Iter-call % |        57.9% |        78.8% |       N/A
+        Iter-output % |        98.5% |        99.9% |       N/A
+
+── SECTION 2: QUOTA PER CALL (cache_read = 1x formula) ─────────────────
+
+  4.6 avg quota/call: 110,782 tokens
+  4.7 avg quota/call: 136,380 tokens
+  Multiplier: 1.23x
+
+  ArkNill claim: adaptive thinking → 2.4x averaged Q5h burn.
+  Our measurement: WEAK support (observed 1.23x; close to tokenizer-only 1.0-1.35x)
+
+── SECTION 3: 4.7 DAILY BREAKDOWN ──────────────────────────────────────
+
+  Date       | Calls | AvgInput | AvgOutput | AvgCacheRead | Daily Q(1x)
+  -----------|-------|----------|-----------|--------------|------------
+  2026-04-16 |    97 |        3 |      1518 |        81008 |      9.05M
+  2026-04-19 |   424 |        3 |       871 |        71994 |     38.54M
+  2026-04-20 |   964 |        5 |      1177 |       103143 |    110.27M
+  2026-04-21 |  1130 |        4 |      1036 |       165196 |    198.77M
+
+── SECTION 4: 5h SLIDING WINDOWS BY DOMINANT MODEL ────────────────────
+
+  A window is labeled "4.6" or "4.7" if >50% of calls use that model.
+  Only considers windows starting from Apr 2 (fair comparison span).
+
+  Dominant | Windows | Mean Util | p50 Util | p90 Util | p99 Util | Max Util | >80% | >100%
+  ---------|---------|-----------|----------|----------|----------|----------|------|------
+       4.6 |     963 |     45.8% |    15.0% |   132.1% |   574.6% |   630.6% |  173 |   147
+       4.7 |     174 |     19.8% |     7.1% |    59.1% |   104.1% |   110.8% |    7 |     7
+
+  Mean utilization 4.7 / 4.6 ratio: 0.43x
+  p90  utilization 4.7 / 4.6 ratio: 0.45x
+
+── KEY FINDINGS ────────────────────────────────────────────────────────
+
+  1. Per-call token multipliers (4.7 vs 4.6):
+       input      0.09x   (advisory: 1.0–1.35x tokenizer)
+       output     2.61x   (advisory: adaptive thinking heavier)
+       cache_read 1.20x   (advisory: cache metering anomaly ~7x reported)
+
+  2. Iter-call share: 4.6 57.9%, 4.7 78.8%
+     Iter-output share: 4.6 98.5%, 4.7 99.9%
+     Δ 1.4 pp — small.
+
+  3. Sample sizes: 4.6 32299 calls, 4.7 2615 calls.
+     CAVEAT: early-window 4.7 data. Workload mix may not match 4.6 baseline.
