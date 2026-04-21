@@ -147,33 +147,45 @@ console.log(`  4.7 avg quota/call: ${qpc47.toLocaleString(undefined, {maximumFra
 console.log(`  Multiplier: ${qpc46 > 0 ? (qpc47 / qpc46).toFixed(2) + 'x' : 'N/A'}`);
 console.log();
 console.log(`  ArkNill claim: adaptive thinking → 2.4x averaged Q5h burn.`);
-if (qpc46 > 0) {
-  const mult = qpc47 / qpc46;
-  const verdict = mult >= 2.0 ? `CONSISTENT with advisory (observed ${mult.toFixed(2)}x ≥ 2.0x threshold)`
-    : mult >= 1.35 ? `PARTIAL support (observed ${mult.toFixed(2)}x; between tokenizer-only 1.35x and claimed 2.4x)`
-    : mult >= 1.0 ? `WEAK support (observed ${mult.toFixed(2)}x; close to tokenizer-only 1.0-1.35x)`
-    : `NO support (observed ${mult.toFixed(2)}x < 1.0x)`;
-  console.log(`  Our measurement: ${verdict}`);
-}
+console.log(`  DO NOT USE this aggregate multiplier as corroboration or refutation.`);
+console.log(`  See Section 3 daily breakdown and Key Findings #2: the per-call`);
+console.log(`  multiplier here is confounded with workload-mix variance between the`);
+console.log(`  4.6 comparison window (Apr 2-15) and the 4.7 window (Apr 16-21).`);
 
-// ─── Section 3: Daily breakdown for the 4.7 window ─────────────────────────
-console.log('\n── SECTION 3: 4.7 DAILY BREAKDOWN ──────────────────────────────────────\n');
-const daily47 = {};
-for (const c of calls) {
-  if (classify(c) !== '4.7') continue;
-  if (!daily47[c.date]) daily47[c.date] = { n: 0, input: 0, output: 0, cache_read: 0, cache_create: 0 };
-  const d = daily47[c.date];
-  d.n++;
-  d.input += c.input; d.output += c.output;
-  d.cache_read += c.cache_read; d.cache_create += c.cache_create;
+// ─── Section 3: Daily breakdown — 4.6 then 4.7 ─────────────────────────────
+// Section 3 is critical for judging whether the per-call multipliers in
+// Sections 1-2 reflect real 4.7 effects or workload-variance between the
+// comparison spans. Both models show huge day-to-day variance in per-call
+// token averages, so the aggregate multipliers should not be over-read.
+console.log('\n── SECTION 3: DAILY BREAKDOWN BY MODEL ─────────────────────────────────\n');
+console.log('  Critical for interpretation: look at day-to-day variance before');
+console.log('  reading the aggregate multipliers in Section 1 as "4.7 vs 4.6".');
+console.log('  Adjacent-date comparisons (4.6 Apr 10-15 vs 4.7 Apr 16-21) are');
+console.log('  much more informative than the full-span aggregates.\n');
+
+function dailyTable(model, label, dateFilter) {
+  const daily = {};
+  for (const c of calls) {
+    if (c.model !== model) continue;
+    if (dateFilter && !dateFilter(c.date)) continue;
+    if (!daily[c.date]) daily[c.date] = { n: 0, input: 0, output: 0, cache_read: 0, cache_create: 0 };
+    const d = daily[c.date];
+    d.n++;
+    d.input += c.input; d.output += c.output;
+    d.cache_read += c.cache_read; d.cache_create += c.cache_create;
+  }
+  console.log(`  ${label}:`);
+  console.log('  Date       | Calls | AvgInput | AvgOutput | AvgCacheRead | Daily Q(1x)');
+  console.log('  -----------|-------|----------|-----------|--------------|------------');
+  for (const d of Object.keys(daily).sort()) {
+    const x = daily[d];
+    const q = x.input + x.cache_create + x.output * 5 + x.cache_read;
+    console.log(`  ${d} | ${pad(x.n, 5)} | ${pad(Math.round(x.input/x.n), 8)} | ${pad(Math.round(x.output/x.n), 9)} | ${pad(Math.round(x.cache_read/x.n), 12)} | ${pad(fmtM(q), 10)}`);
+  }
 }
-console.log('  Date       | Calls | AvgInput | AvgOutput | AvgCacheRead | Daily Q(1x)');
-console.log('  -----------|-------|----------|-----------|--------------|------------');
-for (const d of Object.keys(daily47).sort()) {
-  const x = daily47[d];
-  const q = x.input + x.cache_create + x.output * 5 + x.cache_read;
-  console.log(`  ${d} | ${pad(x.n, 5)} | ${pad(Math.round(x.input/x.n), 8)} | ${pad(Math.round(x.output/x.n), 9)} | ${pad(Math.round(x.cache_read/x.n), 12)} | ${pad(fmtM(q), 10)}`);
-}
+dailyTable('claude-opus-4-6', '4.6 comparison window (Apr 2-15)', d => d >= FOUR_SIX_START && d <= FOUR_SIX_END);
+console.log();
+dailyTable('claude-opus-4-7', '4.7 window (Apr 16+)', d => d >= FOUR_SEVEN_START);
 
 // ─── Section 4: 5h sliding windows, by dominant-model ──────────────────────
 console.log('\n── SECTION 4: 5h SLIDING WINDOWS BY DOMINANT MODEL ────────────────────\n');
@@ -260,22 +272,32 @@ if (s46.n > 0 && s47.n > 0) {
   const inputMult = s47.avg_input / s46.avg_input;
   const outputMult = s47.avg_output / s46.avg_output;
   const crMult = s47.avg_cache_read / s46.avg_cache_read;
-  const iterCallDelta = s47.iter_call_frac - s46.iter_call_frac;
   const iterOutDelta = s47.iter_output_frac - s46.iter_output_frac;
 
-  console.log(`  1. Per-call token multipliers (4.7 vs 4.6):`);
-  console.log(`       input      ${inputMult.toFixed(2)}x   (advisory: 1.0–1.35x tokenizer)`);
-  console.log(`       output     ${outputMult.toFixed(2)}x   (advisory: adaptive thinking heavier)`);
-  console.log(`       cache_read ${crMult.toFixed(2)}x   (advisory: cache metering anomaly ~7x reported)`);
+  console.log(`  1. Per-call aggregate multipliers (4.7 vs 4.6):`);
+  console.log(`       input      ${inputMult.toFixed(2)}x`);
+  console.log(`       output     ${outputMult.toFixed(2)}x`);
+  console.log(`       cache_read ${crMult.toFixed(2)}x`);
+  console.log(`       iter-call share delta: ${((s47.iter_call_frac - s46.iter_call_frac)*100).toFixed(1)} pp`);
   console.log();
-  console.log(`  2. Iter-call share: 4.6 ${pct(s46.iter_call_frac)}, 4.7 ${pct(s47.iter_call_frac)}`);
-  console.log(`     Iter-output share: 4.6 ${pct(s46.iter_output_frac)}, 4.7 ${pct(s47.iter_output_frac)}`);
-  if (Math.abs(iterOutDelta) > 0.05) {
-    console.log(`     Δ ${(iterOutDelta*100).toFixed(1)} pp — notable shift in iter contribution.`);
-  } else {
-    console.log(`     Δ ${(iterOutDelta*100).toFixed(1)} pp — small.`);
-  }
+  console.log(`  2. DO NOT OVER-READ THESE AS "4.7 EFFECTS".`);
+  console.log(`     The daily breakdown in Section 3 shows 4.6 has massive within-span`);
+  console.log(`     variance in per-call averages (e.g. input 1.9-93 tokens, cache_read`);
+  console.log(`     41K-233K across Apr 2-15 on 4.6 alone). The aggregate multipliers`);
+  console.log(`     are confounded with workload-mix differences between spans.`);
   console.log();
-  console.log(`  3. Sample sizes: 4.6 ${s46.n} calls, 4.7 ${s47.n} calls.`);
-  console.log(`     CAVEAT: early-window 4.7 data. Workload mix may not match 4.6 baseline.`);
+  console.log(`     The Apr 10-15 4.6 tail (closest workload to 4.7 window) has avg input`);
+  console.log(`     2-14 tokens — continuous with the 4.7 range of 2-5. So "input 0.10x"`);
+  console.log(`     is an averaging artifact from including early-April heavy-input days.`);
+  console.log();
+  console.log(`  3. WHAT THIS DATASET CAN AND CANNOT SAY:`);
+  console.log(`     Can say: 4.6 and 4.7 both show low-input, cache_read-dominated profiles.`);
+  console.log(`              Iter-call share differs between spans (${pct(s46.iter_call_frac)} vs ${pct(s47.iter_call_frac)}).`);
+  console.log(`     Cannot say: whether tokenizer-inflation or Q5h-burn claims in`);
+  console.log(`                 16_OPUS-47-ADVISORY.md are corroborated at per-call`);
+  console.log(`                 granularity. Sample too small, workload too variable.`);
+  console.log(`                 A workload-matched comparison (same task repeated on`);
+  console.log(`                 both models) is the right test.`);
+  console.log();
+  console.log(`  4. Sample sizes: 4.6 ${s46.n} calls, 4.7 ${s47.n} calls.`);
 }

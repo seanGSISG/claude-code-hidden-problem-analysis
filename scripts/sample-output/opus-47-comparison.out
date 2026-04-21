@@ -25,10 +25,35 @@
   Multiplier: 1.23x
 
   ArkNill claim: adaptive thinking → 2.4x averaged Q5h burn.
-  Our measurement: WEAK support (observed 1.23x; close to tokenizer-only 1.0-1.35x)
+  DO NOT USE this aggregate multiplier as corroboration or refutation.
+  See Section 3 daily breakdown and Key Findings #2: the per-call
+  multiplier here is confounded with workload-mix variance between the
+  4.6 comparison window (Apr 2-15) and the 4.7 window (Apr 16-21).
 
-── SECTION 3: 4.7 DAILY BREAKDOWN ──────────────────────────────────────
+── SECTION 3: DAILY BREAKDOWN BY MODEL ─────────────────────────────────
 
+  Critical for interpretation: look at day-to-day variance before
+  reading the aggregate multipliers in Section 1 as "4.7 vs 4.6".
+  Adjacent-date comparisons (4.6 Apr 10-15 vs 4.7 Apr 16-21) are
+  much more informative than the full-span aggregates.
+
+  4.6 comparison window (Apr 2-15):
+  Date       | Calls | AvgInput | AvgOutput | AvgCacheRead | Daily Q(1x)
+  -----------|-------|----------|-----------|--------------|------------
+  2026-04-02 |  2026 |       42 |       205 |        69391 |    151.61M
+  2026-04-03 |  2812 |       45 |       207 |        83279 |    247.12M
+  2026-04-04 |   306 |        2 |       178 |        39517 |     13.90M
+  2026-04-05 |  5886 |       80 |       181 |        67639 |    429.26M
+  2026-04-06 |  1563 |       12 |       255 |        61497 |    106.82M
+  2026-04-07 |   755 |        2 |       290 |       112859 |     93.62M
+  2026-04-08 |  3794 |       93 |       367 |       114031 |    461.63M
+  2026-04-09 |  3806 |       28 |       577 |        92038 |    384.09M
+  2026-04-10 |  6287 |       14 |       354 |        74296 |    500.95M
+  2026-04-11 |  4793 |        6 |       948 |       233210 |   1173.43M
+  2026-04-13 |   115 |        2 |       729 |        41384 |      5.68M
+  2026-04-15 |   156 |        7 |       995 |        53459 |     10.05M
+
+  4.7 window (Apr 16+):
   Date       | Calls | AvgInput | AvgOutput | AvgCacheRead | Daily Q(1x)
   -----------|-------|----------|-----------|--------------|------------
   2026-04-16 |    97 |        3 |      1518 |        81008 |      9.05M
@@ -51,14 +76,29 @@
 
 ── KEY FINDINGS ────────────────────────────────────────────────────────
 
-  1. Per-call token multipliers (4.7 vs 4.6):
-       input      0.09x   (advisory: 1.0–1.35x tokenizer)
-       output     2.61x   (advisory: adaptive thinking heavier)
-       cache_read 1.20x   (advisory: cache metering anomaly ~7x reported)
+  1. Per-call aggregate multipliers (4.7 vs 4.6):
+       input      0.09x
+       output     2.61x
+       cache_read 1.20x
+       iter-call share delta: 20.9 pp
 
-  2. Iter-call share: 4.6 57.9%, 4.7 78.8%
-     Iter-output share: 4.6 98.5%, 4.7 99.9%
-     Δ 1.4 pp — small.
+  2. DO NOT OVER-READ THESE AS "4.7 EFFECTS".
+     The daily breakdown in Section 3 shows 4.6 has massive within-span
+     variance in per-call averages (e.g. input 1.9-93 tokens, cache_read
+     41K-233K across Apr 2-15 on 4.6 alone). The aggregate multipliers
+     are confounded with workload-mix differences between spans.
 
-  3. Sample sizes: 4.6 32299 calls, 4.7 2615 calls.
-     CAVEAT: early-window 4.7 data. Workload mix may not match 4.6 baseline.
+     The Apr 10-15 4.6 tail (closest workload to 4.7 window) has avg input
+     2-14 tokens — continuous with the 4.7 range of 2-5. So "input 0.10x"
+     is an averaging artifact from including early-April heavy-input days.
+
+  3. WHAT THIS DATASET CAN AND CANNOT SAY:
+     Can say: 4.6 and 4.7 both show low-input, cache_read-dominated profiles.
+              Iter-call share differs between spans (57.9% vs 78.8%).
+     Cannot say: whether tokenizer-inflation or Q5h-burn claims in
+                 16_OPUS-47-ADVISORY.md are corroborated at per-call
+                 granularity. Sample too small, workload too variable.
+                 A workload-matched comparison (same task repeated on
+                 both models) is the right test.
+
+  4. Sample sizes: 4.6 32299 calls, 4.7 2615 calls.
