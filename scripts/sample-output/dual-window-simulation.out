@@ -1,0 +1,124 @@
+═══════════════════════════════════════════════════════════════════════════
+  DUAL-WINDOW SIMULATION: 5-Hour and 7-Day Rate Limit Windows
+═══════════════════════════════════════════════════════════════════════════
+
+── MONTHLY 5-HOUR WINDOW SUMMARY (SLIDING) ────────────────────────────
+
+  Budget reference: 100% of 5h ≈ 180M visible tokens (ArkNill midpoint)
+  Sliding step: 15 min. Tumbling max shown for comparison.
+
+  Month    | Sliding Steps | Avg Util | Max Util (Sliding) | Max Util (Tumbling) | >80% | >100%
+  ---------|---------------|----------|--------------------|---------------------|------|------
+  2025-12  |           283 |    16.4% |              42.4% |               42.4% |    0 |     0
+  2026-01  |          1333 |    23.1% |             126.6% |              116.0% |   36 |    13
+  2026-02  |          1317 |    18.0% |              76.7% |               57.4% |    0 |     0
+  2026-03  |          2093 |    26.2% |             140.9% |              123.9% |  156 |    54
+  2026-04  |           955 |    23.5% |             195.7% |              156.1% |   39 |    27
+
+── TOP 20 HEAVIEST 5-HOUR WINDOWS (SLIDING, DE-OVERLAPPED) ────────────
+
+  Greedy peak-picking: take the heaviest sliding window, skip overlaps,
+  repeat. Each reported peak is a distinct 5h span.
+
+  Rank | Window Start     | Calls | CacheRead  | Output    | Visible    | Est Util | Quota(1x)
+  -----|------------------|-------|------------|-----------|------------|----------|----------
+     1 | 2026-04-11T04:36 |   850 |     345.8M |      0.7M |     352.2M |   195.7% |    355.0M
+     2 | 2026-03-21T05:21 |  2043 |     236.4M |      0.5M |     253.6M |   140.9% |    255.8M
+     3 | 2026-03-30T23:36 |  2014 |     233.6M |      0.3M |     242.3M |   134.6% |    243.7M
+     4 | 2026-01-29T17:36 |  3727 |     206.2M |      0.0M |     228.0M |   126.6% |    228.0M
+     5 | 2026-03-31T22:36 |  1424 |     212.6M |      0.3M |     223.1M |   123.9% |    224.1M
+     6 | 2026-03-26T16:06 |  2376 |     190.4M |      0.5M |     202.0M |   112.2% |    204.1M
+     7 | 2026-04-07T22:51 |  1520 |     187.3M |      0.5M |     199.2M |   110.7% |    201.2M
+     8 | 2026-03-29T19:06 |  2925 |     187.4M |      0.6M |     197.9M |   109.9% |    200.3M
+     9 | 2026-03-17T01:51 |  1993 |     177.9M |      0.4M |     186.2M |   103.5% |    187.9M
+    10 | 2026-03-24T21:06 |  2148 |     167.8M |      0.5M |     177.7M |    98.7% |    179.6M
+    11 | 2026-01-24T02:36 |  3200 |     154.6M |      0.0M |     172.6M |    95.9% |    172.7M
+    12 | 2026-03-15T00:51 |  2489 |     159.4M |      0.6M |     169.3M |    94.0% |    171.6M
+    13 | 2026-03-23T02:36 |  1861 |     158.5M |      0.4M |     165.9M |    92.1% |    167.5M
+    14 | 2026-01-28T17:51 |  2334 |     153.4M |      0.0M |     162.8M |    90.5% |    162.9M
+    15 | 2026-03-25T17:06 |  2523 |     146.7M |      0.6M |     159.4M |    88.6% |    162.0M
+    16 | 2026-03-23T16:06 |  1240 |     149.1M |      0.2M |     154.6M |    85.9% |    155.6M
+    17 | 2026-03-08T05:51 |  2414 |     136.5M |      0.4M |     147.2M |    81.8% |    148.6M
+    18 | 2026-03-20T02:21 |  2435 |     132.8M |      0.5M |     144.3M |    80.2% |    146.4M
+    19 | 2026-04-05T16:36 |  1861 |     129.6M |      0.3M |     139.1M |    77.3% |    140.3M
+    20 | 2026-02-28T03:21 |  2092 |     130.7M |      0.5M |     138.0M |    76.7% |    139.9M
+
+── ROLLING 7-DAY UTILIZATION PEAKS ─────────────────────────────────────
+
+  ArkNill: 7d peaked at 0.966 on April 10. Weekly budget is separate from 5h.
+  Computed from tumbling windows (each 5h bucket counted once in the 7d sum).
+
+  Month    | Peak 7d Visible | As Multiple of 5h Budget | Windows in 7d
+  ---------|-----------------|--------------------------|-------------
+  2025-12  |          373.9M |                     2.1x |           13
+  2026-01  |         1164.7M |                     6.5x |           18
+  2026-02  |         1001.5M |                     5.6x |           19
+  2026-03  |         1845.3M |                    10.3x |           32
+  2026-04  |         1538.7M |                     8.5x |           31
+
+── WOULD YOU HAVE BEEN RATE-LIMITED? (SLIDING) ─────────────────────────
+
+  Sliding window is the real system. Peak util under sliding is the
+  number that would have triggered a rate limit.
+
+  Feb 2026: 1317 sliding steps
+    Heaviest window: 138.0M visible (76.7% of 5h budget)
+    Sliding steps exceeding 80% of 5h budget: 0
+    Sliding steps exceeding 100% of 5h budget: 0
+    Under 0x weight (cache_read free): max quota = 13.5M (7.5%)
+    Under 1x weight: max quota = 139.9M (77.7%)
+
+  Mar 2026: 2093 sliding steps
+    Heaviest window: 253.6M visible (140.9% of 5h budget)
+    Sliding steps exceeding 80% of 5h budget: 156
+    Sliding steps exceeding 100% of 5h budget: 54
+    Under 0x weight (cache_read free): max quota = 19.4M (10.8%)
+    Under 1x weight: max quota = 255.8M (142.1%)
+
+  Apr 2026: 955 sliding steps
+    Heaviest window: 352.2M visible (195.7% of 5h budget)
+    Sliding steps exceeding 80% of 5h budget: 39
+    Sliding steps exceeding 100% of 5h budget: 27
+    Under 0x weight (cache_read free): max quota = 13.9M (7.7%)
+    Under 1x weight: max quota = 355.0M (197.2%)
+
+── 5-HOUR WINDOW UTILIZATION DISTRIBUTION (TUMBLING) ──────────────────
+
+  Tumbling used here so each 5h window is counted once; sliding would
+  over-represent sustained high-usage periods.
+
+  Feb (70 windows):
+       0-10%:   33 ( 47%) ███████████████████
+      10-25%:   19 ( 27%) ███████████
+      25-50%:   12 ( 17%) ███████
+      50-75%:    6 (  9%) ███
+
+  Mar (103 windows):
+       0-10%:   39 ( 38%) ███████████████
+      10-25%:   20 ( 19%) ████████
+      25-50%:   22 ( 21%) █████████
+      50-75%:   15 ( 15%) ██████
+     75-100%:    6 (  6%) ██
+    100-150%:    1 (  1%) 
+
+  Apr (47 windows):
+       0-10%:   22 ( 47%) ███████████████████
+      10-25%:    8 ( 17%) ███████
+      25-50%:   11 ( 23%) █████████
+      50-75%:    5 ( 11%) ████
+       150%+:    1 (  2%) █
+
+── KEY FINDINGS ────────────────────────────────────────────────────────
+
+  1. Peak 5h utilization (sliding vs tumbling):
+     Feb: sliding 76.7%, tumbling 57.4%
+     Mar: sliding 140.9%, tumbling 123.9%
+     Apr: sliding 195.7%, tumbling 156.1%
+     Sliding catches spikes that straddle tumbling boundaries.
+
+  2. Under the old regime (0x cache_read), NO 5-hour window in any month
+     exceeds the budget. Max quota(0x) across all sliding windows:
+     21.8M = 12.1% of budget
+
+  3. Under the new regime (1x cache_read), multiple sliding windows
+     per day exceed the budget because cache_read tokens dominate.

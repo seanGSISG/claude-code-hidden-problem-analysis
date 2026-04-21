@@ -1,0 +1,119 @@
+═══════════════════════════════════════════════════════════════════════════
+  QUOTA COMPOSITION BREAKDOWN: What Eats Your Budget?
+═══════════════════════════════════════════════════════════════════════════
+
+── RAW TOKEN VOLUMES BY MONTH ──────────────────────────────────────────
+
+  Month    |    Calls |      Input |     Output |  CacheRead |  CacheWrite |    Visible
+  ---------|---------|------------|------------|------------|-------------|----------
+  2025-12  |    4918 |      0.17M |      0.61M |    407.63M |      17.49M |   425.91M
+  2026-01  |   41369 |      7.31M |      1.55M |   2538.03M |     216.36M |  2763.26M
+  2026-02  |   41815 |     13.54M |      2.22M |   1934.46M |     194.49M |  2144.71M
+  2026-03  |   68189 |      4.78M |     14.16M |   4443.78M |     318.67M |  4781.39M
+  2026-04  |   21718 |      1.38M |      6.65M |   2050.81M |     115.45M |  2174.29M
+
+── QUOTA COMPOSITION: cache_read = 0x (OLD REGIME) ────────────────────
+
+  Under this regime, cache_read is FREE. Output at 5x dominates quota.
+
+  Month    |  Quota(0x) |  Input% | CacheWrite% |  Output(5x)% | CacheRead%
+  ---------|------------|---------|-------------|--------------|----------
+  2025-12  |     20.73M |    0.8% |       84.4% |        14.8% |       0.0%
+  2026-01  |    231.44M |    3.2% |       93.5% |         3.4% |       0.0%
+  2026-02  |    219.13M |    6.2% |       88.8% |         5.1% |       0.0%
+  2026-03  |    394.24M |    1.2% |       80.8% |        18.0% |       0.0%
+  2026-04  |    150.09M |    0.9% |       76.9% |        22.2% |       0.0%
+
+── QUOTA COMPOSITION: cache_read = 1x (NEW REGIME) ────────────────────
+
+  Under this regime, cache_read counts at 1x. It dominates by volume.
+
+  Month    |  Quota(1x) |  Input% | CacheWrite% |  Output(5x)% | CacheRead(1x)%
+  ---------|------------|---------|-------------|--------------|----------
+  2025-12  |    428.36M |    0.0% |        4.1% |         0.7% |      95.2%
+  2026-01  |   2769.47M |    0.3% |        7.8% |         0.3% |      91.6%
+  2026-02  |   2153.59M |    0.6% |        9.0% |         0.5% |      89.8%
+  2026-03  |   4838.03M |    0.1% |        6.6% |         1.5% |      91.9%
+  2026-04  |   2200.90M |    0.1% |        5.2% |         1.5% |      93.2%
+
+── QUOTA EXPLOSION: 0x vs 1x SIDE BY SIDE ─────────────────────────────
+
+  Shows how much larger the quota bill becomes when cache_read counts.
+
+  Month    |  Quota(0x) |  Quota(1x) | Multiplier | CacheRead Raw
+  ---------|------------|------------|------------|-------------
+  2025-12  |     20.73M |    428.36M |      20.7x |    407.63M
+  2026-01  |    231.44M |   2769.47M |      12.0x |   2538.03M
+  2026-02  |    219.13M |   2153.59M |       9.8x |   1934.46M
+  2026-03  |    394.24M |   4838.03M |      12.3x |   4443.78M
+  2026-04  |    150.09M |   2200.90M |      14.7x |   2050.81M
+
+── VISIBLE TOKEN COMPOSITION (ArkNill comparison) ────────────────────
+
+  ArkNill found cache_read = 96-99% of visible tokens per 1% utilization.
+  Our raw visible token composition by month:
+
+  Month    |  CacheRead% of Visible |  Output% of Visible |  Input% of Visible | CacheWrite% of Visible
+  ---------|------------------------|---------------------|--------------------|-----------------------
+  2025-12  |                  95.7% |                0.1% |               0.0% |                   4.1%
+  2026-01  |                  91.8% |                0.1% |               0.3% |                   7.8%
+  2026-02  |                  90.2% |                0.1% |               0.6% |                   9.1%
+  2026-03  |                  92.9% |                0.3% |               0.1% |                   6.7%
+  2026-04  |                  94.3% |                0.3% |               0.1% |                   5.3%
+
+── ESTIMATED TOKENS PER 1% UTILIZATION ─────────────────────────────────
+
+  Using ArkNill benchmark: 1% of 5h = 1.5M-2.1M visible tokens (midpoint 1.8M)
+  100% of 5h window = ~180M visible tokens
+
+  2025-12 (4918 calls):
+    Total visible: 425.91M = ~237% of one 5h window
+    Output per est. 1%: 2.6K (ArkNill: 9.0K-16.0K)
+    CacheRead per est. 1%: 1.72M (ArkNill: 1.50M-2.10M)
+
+  2026-01 (41369 calls):
+    Total visible: 2763.26M = ~1535% of one 5h window
+    Output per est. 1%: 1.0K (ArkNill: 9.0K-16.0K)
+    CacheRead per est. 1%: 1.65M (ArkNill: 1.50M-2.10M)
+
+  2026-02 (41815 calls):
+    Total visible: 2144.71M = ~1192% of one 5h window
+    Output per est. 1%: 1.9K (ArkNill: 9.0K-16.0K)
+    CacheRead per est. 1%: 1.62M (ArkNill: 1.50M-2.10M)
+
+  2026-03 (68189 calls):
+    Total visible: 4781.39M = ~2656% of one 5h window
+    Output per est. 1%: 5.3K (ArkNill: 9.0K-16.0K)
+    CacheRead per est. 1%: 1.67M (ArkNill: 1.50M-2.10M)
+
+  2026-04 (21718 calls):
+    Total visible: 2174.29M = ~1208% of one 5h window
+    Output per est. 1%: 5.5K (ArkNill: 9.0K-16.0K)
+    CacheRead per est. 1%: 1.70M (ArkNill: 1.50M-2.10M)
+
+── ITERATIONS CROSS-REFERENCE ─────────────────────────────────────────
+
+  How do iterations-bearing calls differ in quota composition?
+
+  Month    | Iter Calls |  Iter Output(5x)% |  NoIter Output(5x)% | Iter CacheRead% | NoIter CacheRead%
+  ---------|-----------|-------------------|---------------------|-----------------|------------------
+  2025-12  |         0 |               N/A |                0.7% |             N/A |             95.2%
+  2026-01  |         0 |               N/A |                0.3% |             N/A |             91.6%
+  2026-02  |      3238 |              3.5% |                0.2% |           92.4% |             89.5%
+  2026-03  |     28867 |              2.9% |                0.1% |           92.9% |             90.9%
+  2026-04  |     11390 |              2.4% |                0.1% |           93.9% |             92.1%
+
+── KEY FINDINGS ────────────────────────────────────────────────────────
+
+  1. QUOTA MULTIPLIER from cache_read weight change:
+     Feb: 219.13M (0x) → 2153.59M (1x) = 9.8x increase
+     Mar: 394.24M (0x) → 4838.03M (1x) = 12.3x increase
+
+  2. CACHE READ SHARE of visible tokens:
+     Feb: 90.2% of visible tokens
+     Mar: 92.9% of visible tokens
+
+  3. OUTPUT (5x) SHARE of quota:
+     Under 0x: Feb 5.1%, Mar 18.0%
+     Under 1x: Feb 0.5%, Mar 1.5%
+     When cache_read counts, output's share shrinks but its absolute cost stays the same.

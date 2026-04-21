@@ -1,0 +1,127 @@
+═══════════════════════════════════════════════════════════════════════════
+  THINKING TOKEN ESTIMATION: The Invisible Quota Contributor?
+═══════════════════════════════════════════════════════════════════════════
+
+── THINKING BLOCK PREVALENCE ──────────────────────────────────────────
+
+  Month    |  Total |  w/Thinking | % w/Thinking | Avg Think Chars | Avg Text Chars
+  ---------|--------|-------------|--------------|-----------------|---------------
+  2025-12  |   4918 |        1805 |        36.7% |             272 |              0
+  2026-01  |  41369 |        5596 |        13.5% |             313 |              0
+  2026-02  |  41815 |         804 |         1.9% |             664 |              0
+  2026-03  |  68189 |        3890 |         5.7% |             184 |              1
+  2026-04  |  21718 |        1711 |         7.9% |             112 |              1
+
+── OUTPUT TOKEN GAP: Reported vs Visible Estimate ────────────────────
+
+  For calls WITH thinking blocks:
+  If reported output_tokens >> visible estimate, the gap = thinking tokens.
+
+  Month    | Think Calls | Reported Output | Visible Est   | Gap (think?)  | Avg Gap/Call | Gap+ | Gap-
+  ---------|-------------|-----------------|---------------|---------------|-------------|------|-----
+  2025-12  |        1805 |           0.01M |         0.00M |         0.01M |           5 | 1805 |    0
+  2026-01  |        5596 |           0.02M |         0.00M |         0.02M |           4 | 5596 |    0
+  2026-02  |         804 |           0.01M |         0.00M |         0.01M |           8 |  804 |    0
+  2026-03  |        3890 |           0.06M |         0.00M |         0.06M |          15 | 3741 |  149
+  2026-04  |        1711 |           0.49M |         0.00M |         0.49M |         284 | 1632 |   79
+
+  For calls WITHOUT thinking blocks (control group):
+  Month    | Calls       | Reported Output | Visible Est   | Gap           | Avg Gap/Call
+  ---------|-------------|-----------------|---------------|---------------|------------
+  2025-12  |        3113 |           0.60M |         0.44M |         0.16M |          52
+  2026-01  |       35773 |           1.53M |         5.72M |        -4.19M |        -117
+  2026-02  |       41011 |           2.21M |         6.28M |        -4.06M |         -99
+  2026-03  |       64299 |          14.10M |        10.41M |         3.68M |          57
+  2026-04  |       20007 |           6.16M |         3.08M |         3.08M |         154
+
+── THINKING TOKEN QUOTA IMPACT ─────────────────────────────────────────
+
+  If the gap represents thinking tokens, and they carry 5x output weight:
+
+  Month    | Gap Tokens  | Gap * 5x Weight | Total Quota(1x) | Gap % of Quota
+  ---------|-------------|-----------------|-----------------|---------------
+  2025-12  |       0.01M |           0.05M |         428.36M |           0.0%
+  2026-01  |       0.02M |           0.11M |        2769.47M |           0.0%
+  2026-02  |       0.01M |           0.03M |        2153.59M |           0.0%
+  2026-03  |       0.06M |           0.29M |        4838.03M |           0.0%
+  2026-04  |       0.49M |           2.43M |        2200.90M |           0.1%
+
+── THINKING CONTENT ANALYSIS ───────────────────────────────────────────
+
+  Are thinking blocks empty (just signatures) or do they contain real text?
+
+  2025-12:
+    Avg thinking block chars: 272 (~68 tokens)
+    Avg reported output_tokens: 5
+    Thinking chars as % of reported output: 1360.0%
+    Avg tool_use blocks per thinking call: 0.0
+
+  2026-01:
+    Avg thinking block chars: 313 (~78 tokens)
+    Avg reported output_tokens: 4
+    Thinking chars as % of reported output: 1950.0%
+    Avg tool_use blocks per thinking call: 0.0
+
+  2026-02:
+    Avg thinking block chars: 664 (~166 tokens)
+    Avg reported output_tokens: 8
+    Thinking chars as % of reported output: 2075.0%
+    Avg tool_use blocks per thinking call: 0.0
+
+  2026-03:
+    Avg thinking block chars: 184 (~46 tokens)
+    Avg reported output_tokens: 16
+    Thinking chars as % of reported output: 287.5%
+    Avg tool_use blocks per thinking call: 0.0
+
+  2026-04:
+    Avg thinking block chars: 112 (~28 tokens)
+    Avg reported output_tokens: 285
+    Thinking chars as % of reported output: 9.8%
+    Avg tool_use blocks per thinking call: 0.0
+
+── TOOL_USE ESTIMATE SENSITIVITY (legacy 80/block vs per-block JSON) ──
+
+  ArkNill flagged the fixed 80-token assumption. This table shows the
+  gap under both formulas. If the verdict (gap small/moderate/large)
+  doesn't shift between columns, the estimate is robust.
+
+  Month    | Reported    | Est (new)   | Est (legacy) | Gap (new)   | Gap (legacy) | Gap% (new) | Gap% (legacy)
+  ---------|-------------|-------------|--------------|-------------|--------------|-----------|--------------
+  2025-12  |       0.61M |       0.44M |        0.26M |       0.17M |        0.35M |     27.7% |        57.3%
+  2026-01  |       1.55M |       5.72M |        3.72M |      -4.17M |       -2.16M |   -268.1% |      -139.2%
+  2026-02  |       2.22M |       6.28M |        3.95M |      -4.06M |       -1.73M |   -182.8% |       -78.1%
+  2026-03  |      14.16M |      10.41M |        5.97M |       3.74M |        8.19M |     26.4% |        57.8%
+  2026-04  |       6.65M |       3.08M |        1.87M |       3.57M |        4.79M |     53.7% |        72.0%
+
+  Per-block tool_use token distribution (new formula):
+    n=111415  mean=171  p10=27  p50=44  p90=221  p99=3041  max=23796
+    Legacy assumed 80 for every block. Actual tool_use blocks vary
+    across ~2 orders of magnitude — small Reads vs large Edits.
+
+── ArkNill BLIND SPOT CROSS-REFERENCE ─────────────────────────────────
+
+  ArkNill found output per 1% = 9K-16K tokens (from proxy response bodies).
+  Question: does usage.output_tokens include thinking, or is thinking separate?
+
+  2025-12: reported=0.61M, visible_est=0.44M, gap=0.17M (27.7% of reported)
+  2026-01: reported=1.55M, visible_est=5.72M, gap=-4.17M (-268.1% of reported)
+  2026-02: reported=2.22M, visible_est=6.28M, gap=-4.06M (-182.8% of reported)
+  2026-03: reported=14.16M, visible_est=10.41M, gap=3.74M (26.4% of reported)
+  2026-04: reported=6.65M, visible_est=3.08M, gap=3.57M (53.7% of reported)
+
+  If gap is small (<20%): output_tokens ≈ visible output. Thinking is separate.
+  If gap is large (>50%): output_tokens INCLUDES thinking. Thinking is a major hidden cost.
+
+── KEY FINDINGS ────────────────────────────────────────────────────────
+
+  1. Overall gap between reported output and visible estimate: -0.74M (-2.9%)
+
+  2. The gap is SMALL. This means output_tokens closely matches visible output.
+     Thinking tokens are likely NOT included in output_tokens.
+     They may be billed separately or not billed at all.
+
+  3. CAVEAT: The visible-output estimate uses 4 chars/token for text, and
+     per-block JSON-size/4 + 8 for tool_use (new in v2, replaces fixed 80).
+     Real tokenization varies. See "TOOL_USE ESTIMATE SENSITIVITY" above —
+     the gap verdict can shift between formulas in some months.
