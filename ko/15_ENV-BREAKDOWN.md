@@ -2,7 +2,7 @@
 
 # 환경별 분석 — 세 데이터셋에 걸친 cache_read, 모델 디스패치, 티어 의존적 동작
 
-> [14_DATA-SOURCES.md](14_DATA-SOURCES.md)의 **자매 문서**입니다. 14가 데이터셋을 선언한다면, 이 챕터는 그 데이터셋들을 가로지르는 측정값을 분석합니다. 모든 수치는 2026년 4월 16일에 내부 Postgres 데이터베이스에서 계산된 것입니다.
+> [14_DATA-SOURCES.md](14_DATA-SOURCES.md)의 **자매 문서**입니다. 14가 데이터셋을 선언한다면, 이 챕터는 그 데이터셋들을 가로지르는 측정값을 분석합니다. 모든 수치는 2026년 4월 16일에 내부 Postgres 데이터베이스에서 계산된 것입니다. 모델 대체 검사는 4월 22일에 갱신되었습니다.
 
 ## TL;DR
 
@@ -85,6 +85,8 @@ ubuntu-1만 해당(win-1 데이터셋은 4월 7일부터 시작되며 턴 수가
 
 이는 금주 제3자들이 보고한 패턴과 일치합니다 — 예를 들어 fgrosswig의 게이트웨이 포렌식([#38335](https://github.com/anthropics/claude-code/issues/38335))에서 하루 76건의 조용한 Opus→Haiku 전환과 머신 간 77배 분산을 관측한 것, 그리고 cnighswonger가 Max 5x에서 14K건 이상의 호출에 걸쳐 불일치가 0건이라고 보고한 것과 부합합니다. 여기서의 발견은 보완적입니다: 디스패처가 무엇을 하든, **Max 5x와 Max 20x에서 non-Opus 모델이 얼마나 자주 등장하는지가 다릅니다**. 차이의 특정 메커니즘을 단정하려면 Max 5x에 대한 추가 데이터가 필요합니다.
 
+**모델 대체 검사 (4월 22일 갱신):** Max 20x에서 양쪽 필드가 존재하는 **41,306건의 proxy 요청**에 대해 요청 모델과 응답 모델을 교차 검증한 결과 — **불일치 0건**입니다 ([13_PROXY-DATA.md §2](13_PROXY-DATA.md#model-requestresponse-verification-april-19-update) 참조; 4월 19일의 36,956건에서 확장). Max 20x의 24.2% Haiku 디스패치는 전적으로 합법적인 서브에이전트 트래픽입니다. cnighswonger가 Max 5x에서 14,000건 이상의 호출에 걸쳐 스푸핑 0건을 독립적으로 확인하였습니다 ([Issue #4](https://github.com/ArkNill/claude-code-hidden-problem-analysis/issues/4)). 티어 의존적 디스패치 차이는 실재하지만 **서브에이전트 사용 패턴**을 반영하는 것이며 — 어느 데이터셋에서도 서버 측 모델 라우팅 조작의 증거는 없습니다.
+
 ## 5. PRELIM/FINAL 부풀리기 상태
 
 JSONL 수준의 항목 유형([`01_BUGS.md`](01_BUGS.md#b8), [`03_JSONL-ANALYSIS.md`](03_JSONL-ANALYSIS.md))은 현재 내부 데이터베이스에 일률적으로 `assistant`로 저장되어 있습니다. 파서가 JSONL 최상위 레코드의 `type` 필드를 그대로 캡처하기 때문이며, assistant 턴에 대해서는 이 값이 항상 `assistant`입니다. 예비 대 최종 assistant 항목을 구별하려면 `isPartial` / `stop_reason` / 메시지 콘텐츠 블록 신호가 필요한데, 이는 원본 JSON에는 보존되어 있으나 아직 타입이 있는 컬럼으로 승격되지 않았습니다.
@@ -96,7 +98,7 @@ JSONL 수준의 항목 유형([`01_BUGS.md`](01_BUGS.md#b8), [`03_JSONL-ANALYSIS
 - **Max 5x 표본 크기는 작습니다.** win-1 데이터셋은 총 895 assistant 턴(4월 7–15일)입니다. 이 데이터셋의 cache_read 비율을 Max 20x 데이터셋과 직접 비교해서는 안 됩니다. 디스패치 구성 발견(§4)은 효과 크기가 크기 때문에 보고된 것이지 표본이 크기 때문이 아닙니다.
 - **`ubuntu-1-stock`의 post-4/10은 통제군이 아닌 잔존 활동입니다.** 운영자는 4월 11일에 일상 작업을 분리된 오버라이드 환경으로 이전하였습니다. 해당 일자 이후 stock에 병렬 활동을 요구하는 어떤 비교도 성립하지 않습니다. 대신 pre-4/10 stock을 기준선으로 사용하십시오.
 - **4월 10일까지 JSONL 기록이 공유됩니다.** stock `~/.claude` 저장소와 분리 오버라이드 디렉토리는 분할 이전 날짜에 대해 동일한 항목을 포함합니다. 이는 운영자의 머신에서 두 환경이 구성된 방식에 따른 속성이며 [14_DATA-SOURCES.md §2.2](14_DATA-SOURCES.md#22-공유-저장소-주의사항)에 문서화되어 있습니다. 순수한 "분할 이전" 수치가 필요한 쿼리는 `ts < '2026-04-10'` 필터와 함께 두 데이터셋이 아닌 하나만 선택해야 합니다.
-- **override env와 win-1에 대한 proxy 수준 데이터는 아직 없습니다.** 현재 `ubuntu-1-stock`에 연결된 38,996건의 cc-relay proxy 행이 데이터베이스 내 유일한 proxy 수준 기록입니다. override 환경과 win-1 머신의 intercept 및 telemetry 스트림은 아직 적재되지 않았습니다 — §7 참조.
+- **override env와 win-1에 대한 proxy 수준 데이터는 아직 없습니다.** 현재 `ubuntu-1-stock`에 연결된 45,884건의 cc-relay proxy 행 (4월 1–22일)이 데이터베이스 내 유일한 proxy 수준 기록입니다. override 환경과 win-1 머신의 intercept 및 telemetry 스트림은 아직 적재되지 않았습니다 — §7 참조.
 
 ## 7. 후속 작업
 
