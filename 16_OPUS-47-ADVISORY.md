@@ -1,4 +1,4 @@
-> **🇰🇷 [한국어 버전](ko/16_OPUS-47-ADVISORY.md)**
+> *(Korean translation not yet available for this document)*
 
 # Opus 4.7 Advisory — Do Not Upgrade
 
@@ -321,7 +321,7 @@ Upgrade to Opus 4.7 / newer CC versions when **all** of the following are confir
 - [01_BUGS.md](01_BUGS.md) — B1-B11 technical root cause analysis
 - [09_QUICKSTART.md](09_QUICKSTART.md) — Setup recommendations (updated with 4.7 warning)
 - [02_RATELIMIT-HEADERS.md](02_RATELIMIT-HEADERS.md) — Quota architecture (5h/7d windows)
-- [13_PROXY-DATA.md](13_PROXY-DATA.md) — Proxy dataset (38,996 requests)
+- [13_PROXY-DATA.md](13_PROXY-DATA.md) — Proxy dataset (45,884 requests)
 - [15_ENV-BREAKDOWN.md](15_ENV-BREAKDOWN.md) — Per-environment cache_read breakdown
 
 ---

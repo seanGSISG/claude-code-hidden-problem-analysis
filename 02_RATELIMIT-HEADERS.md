@@ -10,7 +10,7 @@
 
 ## Summary
 
-Anthropic's API returns `anthropic-ratelimit-unified-*` headers on every response. Claude Code reads only `representative-claim` for the usage bar and discards the rest. Our cc-relay proxy captures all of them. From **23,374 requests with headers** (April 4–14), we identified a **dual sliding window** system — a 5-hour window and a 7-day window — and measured the per-1% utilization cost in tokens.
+Anthropic's API returns `anthropic-ratelimit-unified-*` headers on every response. Claude Code reads only `representative-claim` for the usage bar and discards the rest. Our cc-relay proxy captures all of them. From **37,363 requests with headers** (April 4–22), we identified a **dual sliding window** system — a 5-hour window and a 7-day window — and measured the per-1% utilization cost in tokens.
 
 **Key findings:**
 - The 5h window is the bottleneck in **77.4%** of requests (`representative-claim` = `five_hour`). **The 7d window can become the binding constraint** — observed on April 9–10 when 7d utilization reached 0.85–0.97 (see [§9](#9-seven_day-bottleneck-first-observation-april-914))
@@ -47,7 +47,7 @@ anthropic-ratelimit-unified-overage-utilization: 0.0
 | `overage-status` | Extra-usage billing state |
 | `overage-utilization` | Extra-usage budget consumed |
 
-### Aggregate observations (n=3,702 initial; n=23,374 as of April 14)
+### Aggregate observations (n=3,702 initial; n=23,374 as of April 14; n=37,363 as of April 22)
 
 - `representative-claim` = `five_hour` in **77.4%** of requests (18,095/23,374); `seven_day` in **22.6%** (5,279/23,374). Initial 3,702-request sample (April 4–6) showed 100% five_hour — the 7d bottleneck only appeared when 7d utilization approached capacity (April 9–10). See [§9](#9-seven_day-bottleneck-first-observation-april-914).
 - `fallback-percentage` = `0.5` in 100% of requests (23,374/23,374 — zero variance across 14 days)
@@ -145,7 +145,7 @@ All proxy data in this document is from the post-fix period.
 ## 6. Limitations
 
 - **Plan-specific.** Max 20x ($200/mo) data. Per-1% costs likely differ on other tiers.
-- **No before-data — partially resolved.** Proxy started April 4 — no March baseline for comparison. [@seanGSISG's 179K-call dataset](https://github.com/ArkNill/claude-code-hidden-problem-analysis/issues/3) (Dec 2025 – Apr 2026) provides independent before-data confirming per-1% benchmarks hold across the transition period.
+- **No before-data — resolved.** Proxy started April 4 — no March baseline for comparison. This gap is now closed by two independent datasets: [@seanGSISG's 215K-call dataset](https://github.com/ArkNill/claude-code-hidden-problem-analysis/issues/3) (Dec 2025 – Apr 2026, Max 20x) provides counterfactual proof (zero days exceed budget under 0x formula, 18 under 1x) and confirms per-1% benchmarks (1.62–1.72M, within our 1.5–2.1M range). [@cnighswonger's 101K-call dataset](https://github.com/ArkNill/claude-code-hidden-problem-analysis/issues/4) (Jan – Apr 2026, Max 5x) adds January baseline data (474 calls, >20x multiplier even at minimal volume) and corroborates per-1% at 1.67–1.77M. Three independent datasets now converge on the same range. See [Issue #3](https://github.com/ArkNill/claude-code-hidden-problem-analysis/issues/3) for the full cross-validation.
 - **48h / 8 windows.** Consistent trends but small sample size. Full 7-day cycle completes April 10.
 - **5h boundary timing approximate.** Eight reset timestamps observed, not enough to confirm exact pattern.
 - **Thinking tokens partially measured.** JSONL content blocks suggest ~0.0–0.1% of quota ([@seanGSISG](https://github.com/ArkNill/claude-code-hidden-problem-analysis/issues/3)), but server-side computation may differ from displayed content.
@@ -207,7 +207,7 @@ Starting April 11, two independent researchers published cross-account data in [
 
 ### What we know
 
-1. **Consistency within accounts:** Our 38,996 requests over 16 days (dataset `ubuntu-1-stock`, April 1–16) and cnighswonger's 11,502 over 7 days both show zero variance. A subsequent controlled 4-session comparison on the same account confirmed this across 14,000+ metered calls³. The field is a **fixed per-account value**, not dynamically adjusted per request, time of day, or load.
+1. **Consistency within accounts:** Our 45,884 requests over 22 days (dataset `ubuntu-1-stock`, April 1–22) and cnighswonger's 11,502 over 7 days both show zero variance. A subsequent controlled 4-session comparison on the same account confirmed this across 14,000+ metered calls³. As of April 22: **37,363 requests with fallback-percentage header — all 0.5, zero variance**. The field is a **fixed per-account value**, not dynamically adjusted per request, time of day, or load.
 2. **Variation across time:** 0.2 in November 2025 (#12829) vs 0.5 in April 2026 — the value can change over time.
 3. **`overage-status` diverges across accounts on the same plan:** Our Max 20x and cnighswonger's Max 5x both show `allowed`, while 0xNightDev's Max 5x shows `rejected` + `org_level_disabled`.
 
@@ -247,7 +247,7 @@ Sections 1–7 reported `representative-claim` = `five_hour` in 100% of our init
 
 > **Added:** April 14, 2026
 
-Our proxy data in dataset `ubuntu-1-stock` spans April 1–16 (**38,996 total requests**, 23,374 with rate limit headers as of the April 14 analysis). The measurement environment changed during this period:
+Our proxy data in dataset `ubuntu-1-stock` spans April 1–22 (**45,884 total requests**, 37,363 with rate limit headers as of April 22). The §8–9 analysis below was computed on the April 14 snapshot (23,374 headers); the invariance findings hold with the expanded dataset. The measurement environment changed during this period:
 
 | Period | Requests | Environment | Use for |
 |--------|----------|-------------|---------|
@@ -312,6 +312,6 @@ Rate limit headers captured via cc-relay transparent proxy. Each row = one clock
 
 ---
 
-*Environment: dataset `ubuntu-1-stock` — Max 20x ($200/mo), Opus 4.6 1M, v2.1.91 via cc-relay transparent proxy, Linux (ubuntu-1), native `~/.claude` (CC stock mode). 8,794 total proxy requests, 3,702 with rate limit headers (April 4–6 slice used for §1–7). Full current totals: 38,996 requests / 272 sessions (April 1–16). See [14_DATA-SOURCES.md](14_DATA-SOURCES.md) for the full label matrix.*
+*Environment: dataset `ubuntu-1-stock` — Max 20x ($200/mo), Opus 4.6 1M, v2.1.91 via cc-relay transparent proxy, Linux (ubuntu-1), native `~/.claude` (CC stock mode). 8,794 total proxy requests, 3,702 with rate limit headers (April 4–6 slice used for §1–7). Full current totals: 45,884 requests / 320 sessions (April 1–22), 37,363 with rate limit headers. See [14_DATA-SOURCES.md](14_DATA-SOURCES.md) for the full label matrix and [CROSS-VALIDATION-20260422.md](CROSS-VALIDATION-20260422.md) for three-dataset convergence.*
 
 *This analysis is based on community research and personal measurement. It is not endorsed by Anthropic. All data captured using official tools and documented features.*

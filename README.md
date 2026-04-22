@@ -2,13 +2,17 @@
 
 # Claude Code Hidden Problem Analysis
 
-> **TL;DR:** Claude Code has **11 confirmed client-side bugs** (B1-B5, B8, B8a, B9, B10, B11, B2a) plus **3 preliminary findings** (P1-P3). Cache bugs (B1-B2) are fixed in v2.1.91. **Nine remain unfixed as of v2.1.108** (latest, 8 releases later). Proxy data in dataset `ubuntu-1-stock` now covers **38,996 requests** over 16 days (April 1–16, 272 unique sessions). A controlled GrowthBook flag override eliminated B4/B5 events completely (167,818 → 0, 5,500 → 0). The 7d quota window can become the binding constraint — first observed when 7d utilization hit 0.97. Anthropic acknowledged B11 (adaptive thinking zero-reasoning) on HN but has not followed up. **⚠️ Opus 4.7 advisory: [Do not upgrade past v2.1.109](16_OPUS-47-ADVISORY.md) — 2.4x Q5h burn, model pin bypass, cache metering anomaly.**
+> **TL;DR:** Claude Code has **11 confirmed client-side bugs** (B1-B5, B8, B8a, B9, B10, B11, B2a) plus **3 preliminary findings** (P1-P3). Cache bugs (B1-B2) are fixed in v2.1.91. **Nine remain unfixed as of v2.1.112** (latest). Proxy data now covers **45,884 requests** over 22 days (April 1–22, 320 unique sessions). A controlled GrowthBook flag override eliminated B4/B5 events completely (167,818 → 0, 5,500 → 0). The 7d quota window can become the binding constraint — first observed when 7d utilization hit 0.97. Anthropic acknowledged B11 (adaptive thinking zero-reasoning) on HN but has not followed up. **⚠️ Opus 4.7 advisory: [Do not upgrade past v2.1.109](16_OPUS-47-ADVISORY.md) — 2.4x Q5h burn, model pin bypass, cache metering anomaly.**
 >
-> **Last updated:** April 17, 2026 — see [16_OPUS-47-ADVISORY.md](16_OPUS-47-ADVISORY.md) (new: Opus 4.7 advisory), [08_UPDATE-LOG.md](08_UPDATE-LOG.md), and [14_DATA-SOURCES.md](14_DATA-SOURCES.md).
+> **Last updated:** April 22, 2026 — see [CROSS-VALIDATION-20260422.md](CROSS-VALIDATION-20260422.md) (new: three-dataset convergence report), [16_OPUS-47-ADVISORY.md](16_OPUS-47-ADVISORY.md), [08_UPDATE-LOG.md](08_UPDATE-LOG.md), and [14_DATA-SOURCES.md](14_DATA-SOURCES.md).
 
 ---
 
-## Latest Update (April 17)
+## Latest Update (April 22)
+
+### April 22 — Three-Dataset Cross-Validation: 362K API Calls Converge
+
+**New document: [CROSS-VALIDATION-20260422.md](CROSS-VALIDATION-20260422.md)** — Three independent datasets (ArkNill 45.8K proxy, [@seanGSISG](https://github.com/seanGSISG) 215K JSONL, [@cnighswonger](https://github.com/cnighswonger) 101K interceptor) converge on CacheRead per 1% utilization: **1.5–2.1M tokens** across different accounts, plan tiers (Max 5x and 20x), geographies, and collection methods. Quota multiplier (0x vs 1x) ranges from 9.8x to 38.6x depending on cache-read ratio. ArkNill April multiplier: **32.9x**. cnighswonger's January baseline (474 calls, >20x) confirms the weight change affects all usage levels. Proxy dataset expanded to **45,884 requests** across 320 sessions; model substitution check at **41,306 requests — zero mismatches**. New Q7d analysis: 13.5% of requests in 80–100% bucket vs Q5h's 0.6% — the 7-day window is the binding constraint for sustained heavy users. Before-data limitation in `02_RATELIMIT-HEADERS.md` marked as **resolved**. [Issue #3 cross-validation →](https://github.com/ArkNill/claude-code-hidden-problem-analysis/issues/3)
 
 ### April 17 — Opus 4.7 Advisory: Do Not Upgrade Past v2.1.109
 
@@ -121,17 +125,17 @@ Transparent proxy (cc-relay) captured `anthropic-ratelimit-unified-*` headers ac
 
 ---
 
-## Current Status (April 16, 2026 — verified through v2.1.108)
+## Current Status (April 22, 2026 — verified through v2.1.112)
 
 ```mermaid
-pie title Bug Status (12 identified, verified through v2.1.108)
+pie title Bug Status (12 identified, verified through v2.1.112)
     "Fixed (B1, B2)" : 2
     "Unfixed (B3-B5, B8-B11, B8a)" : 8
     "Possibly Fixed (B2a)" : 1
     "By Design (Server)" : 1
 ```
 
-Cache regression (v2.1.89) is **fixed** in v2.1.90-91. **Eight client-side bugs remain unfixed through v2.1.108** (latest). B2a (SendMessage resume) **possibly fixed** in v2.1.101 (CLI resume path fixed, SDK path unconfirmed). P3 ("Output efficiency" prompt) **observed removed** (self-verified). Changelog cross-reference: [01_BUGS.md § Changelog Cross-Reference](01_BUGS.md#changelog-cross-reference-v2192v21101).
+Cache regression (v2.1.89) is **fixed** in v2.1.90-91. **Eight client-side bugs remain unfixed through v2.1.112** (latest). B2a (SendMessage resume) **possibly fixed** in v2.1.101 (CLI resume path fixed, SDK path unconfirmed). P3 ("Output efficiency" prompt) **observed removed** (self-verified). Changelog cross-reference: [01_BUGS.md § Changelog Cross-Reference](01_BUGS.md#changelog-cross-reference-v2192v21101).
 
 | Bug | What It Does | Impact | Status | Details |
 |-----|-------------|--------|--------|---------|
@@ -234,10 +238,10 @@ She [recommended](https://x.com/lydiahallie/status/2039800718371307603) using So
 | **[07_TIMELINE.md](07_TIMELINE.md)** | 14-month chronicle (Phase 1-9) + April 6-9 community acceleration + Anthropic response | Apr 9 |
 | **[08_UPDATE-LOG.md](08_UPDATE-LOG.md)** | Daily investigation log + changelog cross-reference | Apr 16 |
 | **[10_ISSUES.md](10_ISSUES.md)** | 91+ tracked issues + community tools + contributors | Apr 9 |
-| **[13_PROXY-DATA.md](13_PROXY-DATA.md)** | Full proxy dataset (38,996 requests, 272 sessions, April 1–16) with Mermaid visualizations | Apr 16 |
+| **[13_PROXY-DATA.md](13_PROXY-DATA.md)** | Full proxy dataset (45,884 requests, 320 sessions, April 1–22) with Mermaid visualizations | Apr 22 |
 | **[14_DATA-SOURCES.md](14_DATA-SOURCES.md)** | Data label matrix (`ubuntu-1-stock` / `ubuntu-1-override` / `win-1-stock`), reconciliation with earlier "single machine" figures, and internal database schema overview | Apr 16 |
 | **[15_ENV-BREAKDOWN.md](15_ENV-BREAKDOWN.md)** | Per-environment cache_read ratios (pre/post April 10, daily trend), Max 20x vs Max 5x model dispatch comparison, tier-dependent Haiku share finding | Apr 16 |
-| **[02_RATELIMIT-HEADERS.md](02_RATELIMIT-HEADERS.md)** | Dual 5h/7d window architecture, per-1% cost, thinking token blind spot, fallback-percentage extended data | Apr 15 |
+| **[02_RATELIMIT-HEADERS.md](02_RATELIMIT-HEADERS.md)** | Dual 5h/7d window architecture, per-1% cost, thinking token blind spot, fallback-percentage extended data | Apr 22 |
 | **[03_JSONL-ANALYSIS.md](03_JSONL-ANALYSIS.md)** | Session log analysis: PRELIM inflation, subagent costs, lifecycle curve, proxy cross-validation | Apr 6 |
 | **[05_MICROCOMPACT.md](05_MICROCOMPACT.md)** | Deep dive: silent context stripping (Bug 4) + tool result budget (Bug 5) | Apr 15 |
 | **[04_BENCHMARK.md](04_BENCHMARK.md)** | npm vs standalone benchmark with raw per-request data | Apr 3 |
@@ -251,10 +255,10 @@ She [recommended](https://x.com/lydiahallie/status/2039800718371307603) using So
   - **Plan:** Max 20 ($200/mo)
   - **OS:** Linux (Ubuntu), Linux workstation (ubuntu-1)
   - **CC mode:** native `~/.claude` (CC stock, no flag overrides or other instrumentation)
-  - **Versions tested:** v2.1.91 (benchmark), v2.1.90, v2.1.89, v2.1.68. Changelog verified through **v2.1.108**
-  - **Monitoring:** cc-relay v2 transparent proxy — **38,996 total requests across 272 sessions (April 1–16)**
+  - **Versions tested:** v2.1.91 (benchmark), v2.1.90, v2.1.89, v2.1.68. Changelog verified through **v2.1.112**
+  - **Monitoring:** cc-relay v2 transparent proxy — **45,884 total requests across 320 sessions (April 1–22)**
 - **Parallel datasets (tracked separately, see [14_DATA-SOURCES.md](14_DATA-SOURCES.md)):** `ubuntu-1-override` (same machine/account, isolated override environment with a GrowthBook flag override active since April 10 — additional components kept private), `win-1-stock` (Windows 11, Max 5x — research/validation only, not used for the main published analysis)
-- **Date:** April 16, 2026
+- **Date:** April 22, 2026
 
 ---
 
@@ -266,9 +270,9 @@ This analysis builds on work by many community members who independently investi
 |-----|-----------------|
 | [@Sn3th](https://github.com/Sn3th) | Discovered microcompact mechanisms (Bug 4), GrowthBook flags, budget pipeline (Bug 5) |
 | [@rwp65](https://github.com/rwp65) | Discovered client-side false rate limiter (Bug 3) |
-| [@cnighswonger](https://github.com/cnighswonger) | Built [cache-fix interceptor](https://github.com/cnighswonger/claude-code-cache-fix), 4-session controlled comparison with 14K+ metered calls confirming fallback-percentage invariance and zero model substitution on Max 5x ([Issue #4](https://github.com/ArkNill/claude-code-hidden-problem-analysis/issues/4)) |
+| [@cnighswonger](https://github.com/cnighswonger) | Built [cache-fix interceptor](https://github.com/cnighswonger/claude-code-cache-fix) (154+ stars), 101K-call cross-validation (Jan–Apr 2026, Max 5x) with quota multipliers up to 38.6x, January baseline (unique pre-Feb data), 4-session workload comparison, DISABLE_ADAPTIVE_THINKING 3.3x reduction discovery, Explore subagent = Haiku finding ([Issue #3](https://github.com/ArkNill/claude-code-hidden-problem-analysis/issues/3), [Issue #4](https://github.com/ArkNill/claude-code-hidden-problem-analysis/issues/4)) |
 | [@wpank](https://github.com/wpank) | 47,810 requests tracked, v2.1.63 vs v2.1.96 quantitative comparison |
-| [@seanGSISG](https://github.com/seanGSISG) | Independent corroboration with 179K API calls (Dec 2025 – Apr 2026) — before-data, cache_read weight validation, thinking token estimation |
+| [@seanGSISG](https://github.com/seanGSISG) | Independent corroboration with 215K API calls (Dec 2025 – Apr 2026, Max 20x) — counterfactual proof (0 vs 18 days over budget), 6 reproducible analysis scripts (v2), iterations correlation (30.9pp), self-correcting 4.7 analysis ([Issue #3](https://github.com/ArkNill/claude-code-hidden-problem-analysis/issues/3)) |
 | [@fgrosswig](https://github.com/fgrosswig) | 64x budget reduction forensics — 18-day JSONL analysis |
 | [@Commandershadow9](https://github.com/Commandershadow9) | 34-143x capacity reduction analysis, thinking token hypothesis |
 | [@kolkov](https://github.com/kolkov) | Built [ccdiag](https://github.com/kolkov/ccdiag), identified v2.1.91 resume regressions |
