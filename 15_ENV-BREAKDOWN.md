@@ -1,6 +1,6 @@
 # Environment Breakdown — cache_read, model dispatch, and tier-dependent behaviour across three datasets
 
-> **Companion doc** to [14_DATA-SOURCES.md](14_DATA-SOURCES.md). Where 14 declares the datasets, this chapter slices the measurements across them. All figures come from an internal Postgres database, computed on April 16, 2026.
+> **Companion doc** to [14_DATA-SOURCES.md](14_DATA-SOURCES.md). Where 14 declares the datasets, this chapter slices the measurements across them. All figures come from an internal Postgres database. Original computation: April 16, 2026; model substitution check updated April 22.
 
 ## TL;DR
 
@@ -83,7 +83,7 @@ Three observations.
 
 This aligns with the pattern reported by third parties this week — e.g. fgrosswig's gateway forensics ([#38335](https://github.com/anthropics/claude-code/issues/38335)) observing 76 silent Opus-to-Haiku transitions per day with a 77× machine-to-machine variance, and cnighswonger reporting zero mismatches across 14K+ calls on Max 5x. The finding here is complementary: whatever the dispatcher is doing, **it treats Max 5x and Max 20x differently in how often non-Opus models appear at all**. Further data on Max 5x is needed before attributing the difference to a specific mechanism.
 
-**Model substitution check (April 19 update):** Cross-checked request model against response model across 36,956 proxy requests on Max 20x where both fields were present — **zero mismatches** (see [13_PROXY-DATA.md §2](13_PROXY-DATA.md#model-requestresponse-verification-april-19-update)). The 20.77% Haiku dispatch on Max 20x is entirely legitimate subagent traffic. cnighswonger independently confirmed zero spoofing on Max 5x across 14,000+ calls ([Issue #4](https://github.com/ArkNill/claude-code-hidden-problem-analysis/issues/4)). The tier-dependent dispatch difference is real but reflects **subagent usage patterns** — no evidence of server-side model routing manipulation in either dataset.
+**Model substitution check (April 22 update):** Cross-checked request model against response model across **41,306 proxy requests** on Max 20x where both fields were present — **zero mismatches** (see [13_PROXY-DATA.md §2](13_PROXY-DATA.md#model-requestresponse-verification-april-19-update); expanded from 36,956 on April 19). The 24.2% Haiku dispatch on Max 20x is entirely legitimate subagent traffic. cnighswonger independently confirmed zero spoofing on Max 5x across 14,000+ calls ([Issue #4](https://github.com/ArkNill/claude-code-hidden-problem-analysis/issues/4)). The tier-dependent dispatch difference is real but reflects **subagent usage patterns** — no evidence of server-side model routing manipulation in either dataset.
 
 ## 5. PRELIM/FINAL inflation status
 
@@ -96,7 +96,7 @@ Publishing an updated PRELIM/FINAL ratio across the three environments requires 
 - **Sample size on Max 5x is small.** The win-1 dataset has 895 assistant turns in total (April 7–15). Cache_read ratios on this dataset should not be compared directly to the Max 20x datasets; the dispatch composition finding (§4) is reported because the effect size is large, not because the sample is.
 - **`ubuntu-1-stock` post-April 10 is a residual, not a control.** The operator migrated their active work to an isolated override environment on April 11. Any comparison that requires parallel activity on stock after that date does not hold; use pre-4/10 stock as the baseline instead.
 - **Shared JSONL history through April 10.** The stock `~/.claude` store and the isolated override directory contain identical entries for dates before the split. This is a property of how the two environments were constructed on the operator's machine and is documented in [14_DATA-SOURCES.md §2.2](14_DATA-SOURCES.md#22-shared-storage-caveat). Queries that need true "pre-split" figures should filter on `ts < '2026-04-10'` AND choose one dataset, not both.
-- **No proxy-level data for the override env or win-1 yet.** The 38,996 cc-relay proxy rows currently attached to `ubuntu-1-stock` are the only proxy-level records in the database. Intercept and telemetry streams from the override environment and the win-1 machine have not yet been ingested — see §7.
+- **No proxy-level data for the override env or win-1 yet.** The 45,884 cc-relay proxy rows currently attached to `ubuntu-1-stock` (April 1–22) are the only proxy-level records in the database. Intercept and telemetry streams from the override environment and the win-1 machine have not yet been ingested — see §7.
 
 ## 7. Follow-ups
 

@@ -6,6 +6,42 @@
 
 ---
 
+## April 22, 2026 — Three-Dataset Cross-Validation + Community Response
+
+**Focus:** Cross-validate cache_read weight change findings across three independent datasets (ArkNill 45.8K, seanGSISG 215K, cnighswonger 101K). Respond to Issue #3 and #4 community contributions. Send first email response to cnighswonger.
+
+**What was done:**
+- Expanded proxy dataset to **45,884 requests** / 320 sessions / April 1–22 (from 38,996 / 272 / April 1–16)
+- Model substitution check expanded to **41,306 requests** with both request and response model fields — **zero mismatches** (from 36,956 on April 19)
+- Computed ArkNill April quota multiplier: total visible 5.22B / visible-without-cache_read 159M = **32.9x** (falls between seanGSISG 14.7x and cnighswonger 38.6x)
+- New Q7d utilization analysis: **13.5% of Opus requests in 80–100% bucket** (vs 0.6% for Q5h) — the 7-day window binds harder than Q5h for sustained heavy users
+- Cross-validated seanGSISG's Scripts v2: sliding window confirms higher peaks (Mar 140.9%, Apr 195.7%), counterfactual properly leads, tool_use estimate improved (mean=171 vs fixed 80)
+- Validated seanGSISG's 4.7 self-correction: per-call multipliers confounded by workload variance within 4.6 window (avg input varies 2–93 tokens by day). Retraction clean. Structural assessment: 4.7 cost is architectural/pricing, not client-fixable
+- Confirmed iterations = compounding factor (30.9pp gap), not independent driver
+- Confirmed three-dataset CacheRead per 1% convergence: ArkNill 1.5–2.1M, seanGSISG 1.62–1.72M, cnighswonger 1.67–1.77M
+- fallback-percentage 0.5 confirmed invariant: ArkNill 37,363/37,363, cnighswonger 14,000+/14,000+
+- Sent cnighswonger email reply: fgrosswig assessment (technically solid, Gitea mirror + product pivot), 4.7 structural diagnosis, llm-relay introduction (multi-provider diversification)
+- Posted Issue #3 comment with Q5h/Q7d bucket tables, 32.9x multiplier, three-dataset convergence declaration
+
+**Findings:**
+- **Three-dataset convergence** is the headline: CacheRead per 1% lands in the same 1.5–2.1M range across 3 independent datasets with different plans, geographies, and collection methods
+- **Q7d is the overlooked constraint**: 13.5% of requests in Q7d 80–100% vs only 0.6% in Q5h 80–100%. For sustained users, the 7-day window accumulates pressure that the 5-hour window resets away
+- **Before-data limitation resolved**: seanGSISG's Dec 2025 – Mar 2026 data + cnighswonger's January baseline (474 calls, >20x multiplier) close the gap. 02_RATELIMIT-HEADERS.md updated accordingly
+- **Opus 4.7 is structural, not fixable**: Invisible thinking tokens + tokenizer inflation + metering changes are architectural/pricing decisions. DISABLE_ADAPTIVE_THINKING is the only workaround (3.3x reduction per cnighswonger), but it degrades reasoning depth
+
+**Published:**
+- [CROSS-VALIDATION-20260422.md](CROSS-VALIDATION-20260422.md) (new) — three-dataset convergence report
+- [DATASET-ARKNILL-20260422.md](DATASET-ARKNILL-20260422.md) (new) — ArkNill-primary dataset analysis
+- DATASET.md — removed (content absorbed into CROSS-VALIDATION and DATASET-ARKNILL documents above)
+- [README.md](README.md) — April 22 latest update, contributors expanded, environment updated to 45,884/320
+- [02_RATELIMIT-HEADERS.md](02_RATELIMIT-HEADERS.md) — before-data "partially resolved" → "resolved", header count 37,363
+- [13_PROXY-DATA.md](13_PROXY-DATA.md) — totals updated to April 22, model check 41,306
+- [15_ENV-BREAKDOWN.md](15_ENV-BREAKDOWN.md) — model check 41,306
+- [14_DATA-SOURCES.md](14_DATA-SOURCES.md) — proxy requests 45,884
+- Issue #3 comment — [cross-validation response](https://github.com/ArkNill/claude-code-hidden-problem-analysis/issues/3#issuecomment-4294208182)
+
+---
+
 ## April 17, 2026 — Opus 4.7 Advisory Published
 
 **Focus:** Synthesize Opus 4.7 risk data from three independent sources into a formal advisory recommending v2.1.109 as the safe version.
@@ -49,7 +85,7 @@
 
 **Findings:**
 - The published analysis is entirely computed from `ubuntu-1-stock` and remains reproducible from the same sessions. Historical snapshot figures (17,610 requests on April 1–8; 532 JSONL files scanned on April 1–8) are kept as-is and annotated as historical
-- Post-April 10 cache_read ratio under the overridden environment (`ubuntu-1-override`) is **97.08%** on 24,694 assistant turns vs **95.96%** on `ubuntu-1-stock` over the same period — consistent with the 1h TTL being preserved under the override
+- Post-April 10 cache_read ratio under the overridden environment (`ubuntu-1-override`) is **97.08%** on 24,694 assistant turns vs **96.00%** on `ubuntu-1-stock` over the same period — consistent with the 1h TTL being preserved under the override
 - The win-1 Max 5x dataset is deliberately excluded from the main published analysis to preserve the single-plan (Max 20x) control for all figures in this repo
 
 **Published:**

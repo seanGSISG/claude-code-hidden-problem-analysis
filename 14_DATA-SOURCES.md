@@ -14,15 +14,15 @@ Every dataset is tagged with the following dimensions. All downstream analyses a
 | `cc_version` | e.g. `v2.1.91`, `v2.1.109`, `v2.1.110` — representative version, actual value varies over the dataset timespan |
 | `proxy_stack` | array of active proxy/instrumentation layers on the **public** side (e.g. `cc-relay`, `claude-code-cache-fix`). Any private components are recorded internally but not published. |
 
-## 2. Current datasets (as of 2026-04-16)
+## 2. Current datasets (as of 2026-04-22)
 
 | dataset | machine | tier | mode | version | proxy_stack | JSONL files | messages | proxy requests | size |
 |---|---|---|---|---|---|---|---|---|---|
-| `ubuntu-1-stock` | zbook | max20 | stock | v2.1.91 | cc-relay | 2,098 | 246,954 | 38,996 (cc-relay) | 911 MB |
+| `ubuntu-1-stock` | zbook | max20 | stock | v2.1.91 | cc-relay | 2,098 | 246,954 | 45,884 (cc-relay) | 911 MB |
 | `ubuntu-1-override` | zbook | max20 | override | v2.1.109 | (private operational tooling — not disclosed) | 2,324 | 263,630 | (follow-up) | 948 MB |
 | `win-1-stock` | win-1 | max5 | stock | v2.1.110 | transparent proxy + `claude-code-cache-fix` 1.10.0 (public) | 171 | 1,565 | (follow-up) | 5.7 MB |
 
-**Totals: 4,593 JSONL files / 512,149 messages / 38,996 proxy requests / ~1.9 GB**
+**Totals: 4,593 JSONL files / 512,149 messages / 45,884 proxy requests / ~1.9 GB**
 
 ### 2.1 Notes per dataset
 
@@ -39,7 +39,7 @@ Both `~/.claude/projects/` (stock) and `an isolated override environment` (overr
 | figure as published | corresponds to | current equivalent |
 |---|---|---|
 | "1,735 JSONL files, 1.0 GB, single machine" ([`03_JSONL-ANALYSIS.md`](03_JSONL-ANALYSIS.md)) | a snapshot of `ubuntu-1-stock` at the time of that section's authoring | now 2,098 files / 911 MB in `ubuntu-1-stock` (still growing) |
-| "35,554 requests April 1–15, 251 sessions" ([`13_PROXY-DATA.md`](13_PROXY-DATA.md)) | `ubuntu-1-stock` cc-relay proxy, April 1–15 slice | extended to **38,996 requests / 272 sessions / April 1–16** under `ubuntu-1-stock` (cc-relay source) |
+| "35,554 requests April 1–15, 251 sessions" ([`13_PROXY-DATA.md`](13_PROXY-DATA.md)) | `ubuntu-1-stock` cc-relay proxy, April 1–15 slice | extended to **45,884 requests / 320 sessions / April 1–22** under `ubuntu-1-stock` (cc-relay source) |
 | "532 JSONL files, 158.3 MB (April 1–8)" ([`06`, `13 §12`]) | `ubuntu-1-stock` bulk scan snapshot | historical; not re-run. Current `ubuntu-1-stock` corpus is larger (2,098 files), but the 532-file scan remains authoritative for the metrics computed at that time |
 | "4,919 requests, zero B4/B5 after override" ([`01_BUGS.md`](01_BUGS.md)) | `ubuntu-1-stock` cc-relay proxy, April 11–14, override window | unchanged historically. The override continues; post-April 14 data, where relevant to the override measurement, is tracked against `ubuntu-1-override` |
 
@@ -52,7 +52,7 @@ Since April 16, all three datasets above are also indexed in an internal Postgre
 ## 5. What this changes for the existing chapters
 
 - **[`03_JSONL-ANALYSIS.md`](03_JSONL-ANALYSIS.md)** — footer environment descriptor is being updated to `ubuntu-1-stock` explicitly, with the snapshot-vs-current caveat pointed at this document.
-- **[`13_PROXY-DATA.md`](13_PROXY-DATA.md)** — headline proxy totals refreshed to the current cc-relay figures (38,996 requests / 272 sessions, April 1–16). The detailed tables in §5–§11, which were built against specific time slices, retain their original figures and are annotated accordingly.
+- **[`13_PROXY-DATA.md`](13_PROXY-DATA.md)** — headline proxy totals refreshed to the current cc-relay figures (45,884 requests / 320 sessions, April 1–22). The detailed tables in §5–§11, which were built against specific time slices, retain their original figures and are annotated accordingly.
 - **[`02_RATELIMIT-HEADERS.md`](02_RATELIMIT-HEADERS.md)** — environment footer updated, total request count refreshed.
 - **[`README.md`](README.md)** — overview totals updated.
 - **[`15_ENV-BREAKDOWN.md`](15_ENV-BREAKDOWN.md)** — new chapter: per-environment cache_read ratios (pre/post April 10, daily trend around the cut), Max 20x vs Max 5x model dispatch comparison, tier-dependent Haiku share finding.

@@ -2,10 +2,10 @@
 
 # Proxy & Bulk Scan — Full Dataset
 
-> **Date:** April 16, 2026 (data collection ongoing)
+> **Date:** April 22, 2026 (data collection ongoing)
 >
 > **Data sources:**
-> - cc-relay proxy SQLite database — **38,996 API requests intercepted (April 1–16)** across 272 unique sessions (dataset `ubuntu-1-stock`)
+> - cc-relay proxy SQLite database — **45,884 API requests intercepted (April 1–22)** across 320 unique sessions (dataset `ubuntu-1-stock`)
 > - JSONL bulk scan via `jsonl_analyzer.py` — 532 session files, 158.3 MB (April 1-8, not re-run for later dates; historical snapshot)
 >
 > **Relationship to other documents:** [03_JSONL-ANALYSIS.md](03_JSONL-ANALYSIS.md) contains the JSONL client-side analysis (§1-8) and references key findings from this document. [01_BUGS.md](01_BUGS.md) contains bug definitions; this document provides the full measured data. [02_RATELIMIT-HEADERS.md](02_RATELIMIT-HEADERS.md) covers server-side rate limit header analysis. [14_DATA-SOURCES.md](14_DATA-SOURCES.md) explains the full data label matrix and reconciles historical snapshot figures with the current DW state.
@@ -20,14 +20,14 @@
 
 | Metric | Value (Apr 1-8) | Value (Apr 1-15) | Value (Apr 1–16, latest) |
 |--------|-----------------|------------------|--------------------------|
-| Total API requests | 17,610 | 35,554 | **38,996** |
-| Unique sessions | 129 | 251 | **272** |
-| Total input tokens | 12,438,471 | 28,477,426 | **31,091,542** |
-| Total output tokens | 8,214,875 | 15,007,647 | **18,346,556** |
-| Total cache_read | 1,692,619,956 | 2,988,290,095 | **4,084,180,976** |
-| Total cache_creation | 38,785,293 | 64,098,470 | **78,161,480** |
-| Overall cache % | — | 98.3% | **98.8%** |
-| Date range | Apr 1–8 | Apr 1–15 | **Apr 1–16** |
+| Total API requests | 17,610 | 35,554 | 38,996 | **45,884** |
+| Unique sessions | 129 | 251 | 272 | **320** |
+| Total input tokens | 12,438,471 | 28,477,426 | 31,091,542 | **36,544,950** |
+| Total output tokens | 8,214,875 | 15,007,647 | 18,346,556 | **22,200,581** |
+| Total cache_read | 1,692,619,956 | 2,988,290,095 | 4,084,180,976 | **5,059,406,625** |
+| Total cache_creation | 38,785,293 | 64,098,470 | 78,161,480 | **99,890,766** |
+| Overall cache % | — | 98.3% | 98.8% | **98.06%** |
+| Date range | Apr 1–8 | Apr 1–15 | Apr 1–16 | **Apr 1–22** |
 
 ```mermaid
 xychart-beta
@@ -56,7 +56,7 @@ xychart-beta
 ## 2. Model Distribution (Opus vs Subagent)
 
 ```mermaid
-pie title Requests by Model (Apr 1-16, n=38,996)
+pie title Requests by Model (Apr 1-22, n=45,884)
     "Opus (67%)" : 20457
     "Haiku (23%)" : 7157
     "Other (10%)" : 2867
@@ -72,7 +72,7 @@ Haiku subagent cache efficiency improved from 58.1% (Apr 1-8) to **78.2%** (Apr 
 
 ### Model request/response verification (April 19 update)
 
-Cross-checked `model` field in request against `raw_usage.model` in response across 36,956 requests where both fields were present:
+Cross-checked `model` field in request against `raw_usage.model` in response across **41,306 requests** where both fields were present (updated April 22; previously 36,956 as of April 19):
 
 | Request model | Response model | Count |
 |---|---|---:|
@@ -394,4 +394,4 @@ xychart-beta
 
 ---
 
-*Environment: dataset `ubuntu-1-stock` — Max 20x ($200/mo), Opus 4.6 1M, v2.1.91, Linux (ubuntu-1), native `~/.claude` (CC stock mode). cc-relay proxy: **38,996 requests (April 1–16, 272 sessions)**. JSONL corpus: **2,098 files, 911 MB** (historical bulk scan: 532 files in April 1–8 window, 158.3 MB). A parallel `ubuntu-1-override` environment (same account, isolated override environment, GrowthBook flag override active since April 10) is tracked separately — see [14_DATA-SOURCES.md](14_DATA-SOURCES.md). Data collection ongoing.*
+*Environment: dataset `ubuntu-1-stock` — Max 20x ($200/mo), Opus 4.6 1M, v2.1.91, Linux (ubuntu-1), native `~/.claude` (CC stock mode). cc-relay proxy: **45,884 requests (April 1–22, 320 sessions)**. JSONL corpus: **2,098 files, 911 MB** (historical bulk scan: 532 files in April 1–8 window, 158.3 MB). A parallel `ubuntu-1-override` environment (same account, isolated override environment, GrowthBook flag override active since April 10) is tracked separately — see [14_DATA-SOURCES.md](14_DATA-SOURCES.md). Data collection ongoing. Three-dataset cross-validation: [CROSS-VALIDATION-20260422.md](CROSS-VALIDATION-20260422.md).*

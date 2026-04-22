@@ -16,15 +16,15 @@
 | `cc_version` | 예: `v2.1.91`, `v2.1.109`, `v2.1.110` — 대표 버전이며, 실제 값은 데이터셋 기간에 따라 달라집니다 |
 | `proxy_stack` | **공개** 측에 활성화된 프록시/계측 계층의 배열(예: `cc-relay`, `claude-code-cache-fix`). 비공개 구성요소는 내부적으로 기록하되 공개하지 않습니다. |
 
-## 2. 현재 데이터셋 (2026-04-16 기준)
+## 2. 현재 데이터셋 (2026-04-22 기준)
 
 | dataset | machine | tier | mode | version | proxy_stack | JSONL 파일 | messages | proxy 요청 | 크기 |
 |---|---|---|---|---|---|---|---|---|---|
-| `ubuntu-1-stock` | zbook | max20 | stock | v2.1.91 | cc-relay | 2,098 | 246,954 | 38,996 (cc-relay) | 911 MB |
+| `ubuntu-1-stock` | zbook | max20 | stock | v2.1.91 | cc-relay | 2,098 | 246,954 | 45,884 (cc-relay) | 911 MB |
 | `ubuntu-1-override` | zbook | max20 | override | v2.1.109 | (비공개 운영 도구 — 공개하지 않음) | 2,324 | 263,630 | (후속 작업) | 948 MB |
 | `win-1-stock` | win-1 | max5 | stock | v2.1.110 | 투명 프록시 + `claude-code-cache-fix` 1.10.0 (공개) | 171 | 1,565 | (후속 작업) | 5.7 MB |
 
-**총합: JSONL 파일 4,593개 / 메시지 512,149개 / proxy 요청 38,996건 / 약 1.9 GB**
+**총합: JSONL 파일 4,593개 / 메시지 512,149개 / proxy 요청 45,884건 / 약 1.9 GB**
 
 ### 2.1 데이터셋별 비고
 
@@ -41,7 +41,7 @@ ubuntu-1의 `~/.claude/projects/`(stock)과 분리된 오버라이드 환경(ove
 | 발표된 수치 | 해당하는 데이터 | 현재 등가 수치 |
 |---|---|---|
 | "1,735개 JSONL 파일, 1.0 GB, 단일 머신" ([`03_JSONL-ANALYSIS.md`](03_JSONL-ANALYSIS.md)) | 해당 섹션 작성 시점의 `ubuntu-1-stock` 스냅샷 | 현재 `ubuntu-1-stock`에서 2,098개 파일 / 911 MB (계속 증가 중) |
-| "4월 1–15일 35,554건 요청, 251개 세션" ([`13_PROXY-DATA.md`](13_PROXY-DATA.md)) | `ubuntu-1-stock` cc-relay proxy, 4월 1–15일 구간 | `ubuntu-1-stock` 하에서 **38,996건 요청 / 272개 세션 / 4월 1–16일**로 확장 (cc-relay 소스) |
+| "4월 1–15일 35,554건 요청, 251개 세션" ([`13_PROXY-DATA.md`](13_PROXY-DATA.md)) | `ubuntu-1-stock` cc-relay proxy, 4월 1–15일 구간 | `ubuntu-1-stock` 하에서 **45,884건 요청 / 320개 세션 / 4월 1–22일**로 확장 (cc-relay 소스) |
 | "532개 JSONL 파일, 158.3 MB (4월 1–8일)" ([`06`, `13 §12`]) | `ubuntu-1-stock` 일괄 스캔 스냅샷 | 과거 데이터이며 재실행하지 않음. 현재 `ubuntu-1-stock` 코퍼스는 더 크지만(2,098개 파일), 당시 계산된 지표에 대해서는 532개 파일 스캔이 권위 있는 자료로 유지됩니다 |
 | "오버라이드 이후 4,919건 요청, B4/B5 0건" ([`01_BUGS.md`](01_BUGS.md)) | `ubuntu-1-stock` cc-relay proxy, 4월 11–14일 오버라이드 윈도우 | 과거 수치는 변하지 않음. 오버라이드는 계속되며, 오버라이드 측정과 관련된 4월 14일 이후 데이터는 `ubuntu-1-override`에 대해 추적됩니다 |
 
@@ -54,7 +54,7 @@ ubuntu-1의 `~/.claude/projects/`(stock)과 분리된 오버라이드 환경(ove
 ## 5. 이 변경이 기존 챕터에 미치는 영향
 
 - **[`03_JSONL-ANALYSIS.md`](03_JSONL-ANALYSIS.md)** — 하단 환경 기술자가 명시적으로 `ubuntu-1-stock`으로 갱신되며, 스냅샷 대 현재 수치 주의사항이 이 문서를 가리키도록 업데이트됩니다.
-- **[`13_PROXY-DATA.md`](13_PROXY-DATA.md)** — 대표 proxy 총계가 현재 cc-relay 수치(4월 1–16일, 38,996건 요청 / 272개 세션)로 갱신되었습니다. §5–§11의 상세 테이블들은 특정 기간에 대해 작성된 것이며, 원본 수치를 유지하고 해당 사실을 주석으로 명시합니다.
+- **[`13_PROXY-DATA.md`](13_PROXY-DATA.md)** — 대표 proxy 총계가 현재 cc-relay 수치(4월 1–22일, 45,884건 요청 / 320개 세션)로 갱신되었습니다. §5–§11의 상세 테이블들은 특정 기간에 대해 작성된 것이며, 원본 수치를 유지하고 해당 사실을 주석으로 명시합니다.
 - **[`02_RATELIMIT-HEADERS.md`](02_RATELIMIT-HEADERS.md)** — 환경 하단이 갱신되었고, 총 요청 수가 최신화되었습니다.
 - **[`README.md`](README.md)** — 개요 총계가 갱신되었습니다.
 - **[`15_ENV-BREAKDOWN.md`](15_ENV-BREAKDOWN.md)** — 신규 챕터: 환경별 cache_read 비율(4월 10일 기준 전/후, 기준일 전후의 일별 추이), Max 20x 대 Max 5x 모델 디스패치 비교, 티어에 의존하는 Haiku 비율 발견.
