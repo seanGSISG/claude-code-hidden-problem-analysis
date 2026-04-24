@@ -1,4 +1,6 @@
 > *(Korean translation not yet available for this document)*
+>
+> **📌 April 24 update:** Anthropic published a [postmortem](https://www.anthropic.com/engineering/april-23-postmortem) admitting 3 product-layer bugs. CHANGELOG cross-check, post-postmortem issues, and updated checklist: **[17_OPUS-47-POSTMORTEM-ANALYSIS.md](17_OPUS-47-POSTMORTEM-ANALYSIS.md)**
 
 # Opus 4.7 Advisory — Do Not Upgrade
 
@@ -306,13 +308,17 @@ Upgrade to Opus 4.7 / newer CC versions when **all** of the following are confir
 - [ ] Adaptive thinking tokens included in API usage response (transparency)
 - [ ] Independent measurement confirms Q5h burn rate within 1.5x of 4.6 (accounting for tokenizer)
 - [ ] Korean tokenizer penalty measured and acceptable (<1.5x on typical CLAUDE.md + conversation)
-- [ ] Long-context retrieval regression addressed (91.9% → 59.2% overall, 78.3% → 32.2% at 524K-1024K)
+- [ ] Long-context retrieval regression addressed (91.9% → 59.2% at 256K context, 78.3% → 32.2% at 1M context per system card)
+- [x] ~~Effort default~~ — **FIXED** (v2.1.117, April 21 — Pro/Max subscribers)
+- [ ] [#52502](https://github.com/anthropics/claude-code/issues/52502) — Subagent model pin respected (billing impact) *(added April 24)*
+- [ ] [#52534](https://github.com/anthropics/claude-code/issues/52534) — Effort override bypass resolved (`unpinOpus47LaunchEffort`) *(added April 24)*
 
 **Monitoring resources:**
 - [CC changelog](https://code.claude.com/docs/en/changelog) — check each release for #49302/#49503 fixes
 - [@cnighswonger/claude-code-cache-fix](https://github.com/cnighswonger/claude-code-cache-fix) — community interceptor updates
 - [fgrosswig/claude-gateway](https://github.com/fgrosswig/claude-gateway) — proxy forensics data
-- X/Twitter: Opus 4.7 sentiment and new discoveries
+- [@ClaudeDevs on X](https://x.com/ClaudeDevs) — official Anthropic product updates (announced April 23)
+- [17_OPUS-47-POSTMORTEM-ANALYSIS.md](17_OPUS-47-POSTMORTEM-ANALYSIS.md) — postmortem cross-check and post-postmortem issues
 
 ---
 
