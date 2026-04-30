@@ -2,13 +2,19 @@
 
 # Claude Code Hidden Problem Analysis
 
-> **TL;DR:** Claude Code has **11 confirmed client-side bugs** (B1-B5, B8, B8a, B9, B10, B11, B2a) plus **3 preliminary findings** (P1-P3). Cache bugs (B1-B2) are fixed in v2.1.91. **Nine remain unfixed as of v2.1.112** (latest). Proxy data now covers **45,884 requests** over 22 days (April 1–22, 320 unique sessions). A controlled GrowthBook flag override eliminated B4/B5 events completely (167,818 → 0, 5,500 → 0). The 7d quota window can become the binding constraint — first observed when 7d utilization hit 0.97. Anthropic acknowledged B11 (adaptive thinking zero-reasoning) on HN but has not followed up. **⚠️ Opus 4.7 advisory: [Do not upgrade past v2.1.109](16_OPUS-47-ADVISORY.md) — 2.4x Q5h burn, model pin bypass, cache metering anomaly.**
+> **TL;DR:** Claude Code has **11 confirmed client-side bugs** (B1-B5, B8, B8a, B9, B10, B11, B2a) plus **3 preliminary findings** (P1-P3). Cache bugs (B1-B2) are fixed in v2.1.91. **Nine remain unfixed as of v2.1.119** (latest). Proxy data now covers **45,884 requests** over 22 days (April 1–22, 320 unique sessions). A controlled GrowthBook flag override eliminated B4/B5 events completely (167,818 → 0, 5,500 → 0). The 7d quota window can become the binding constraint — first observed when 7d utilization hit 0.97. Anthropic acknowledged B11 (adaptive thinking zero-reasoning) on HN but has not followed up. **⚠️ Opus 4.7 advisory: [Do not upgrade past v2.1.109](16_OPUS-47-ADVISORY.md) — 2.4x Q5h burn, model pin bypass, cache metering anomaly.** Anthropic published an [April 23 postmortem](https://www.anthropic.com/engineering/april-23-postmortem) admitting 3 product-layer bugs; CHANGELOG analysis shows 2 of 3 were never documented — see [17_OPUS-47-POSTMORTEM-ANALYSIS.md](17_OPUS-47-POSTMORTEM-ANALYSIS.md).
 >
-> **Last updated:** April 22, 2026 — see [CROSS-VALIDATION-20260422.md](CROSS-VALIDATION-20260422.md) (new: three-dataset convergence report), [16_OPUS-47-ADVISORY.md](16_OPUS-47-ADVISORY.md), [08_UPDATE-LOG.md](08_UPDATE-LOG.md), and [14_DATA-SOURCES.md](14_DATA-SOURCES.md).
+> **Last updated:** April 24, 2026 — see [17_OPUS-47-POSTMORTEM-ANALYSIS.md](17_OPUS-47-POSTMORTEM-ANALYSIS.md) (new: postmortem cross-check, CHANGELOG transparency analysis, post-postmortem issues), [CROSS-VALIDATION-20260422.md](CROSS-VALIDATION-20260422.md), [16_OPUS-47-ADVISORY.md](16_OPUS-47-ADVISORY.md), and [08_UPDATE-LOG.md](08_UPDATE-LOG.md).
 
 ---
 
-## Latest Update (April 22)
+## Latest Update (April 24)
+
+### April 24 — Postmortem Analysis: What the Changelog Didn't Say
+
+**New chapter: [17_OPUS-47-POSTMORTEM-ANALYSIS.md](17_OPUS-47-POSTMORTEM-ANALYSIS.md)** — Anthropic's [April 23 postmortem](https://www.anthropic.com/engineering/april-23-postmortem) admitted three product-layer bugs (effort default downgrade, thinking cache clearing bug, verbosity system prompt). Cross-checking against the CHANGELOG (3,285 lines, all versions v2.1.68–v2.1.119 searched) reveals: **2 of 3 bugs have zero CHANGELOG documentation** — the thinking cache bug (v2.1.101 fix) and verbosity prompt (v2.1.116 revert) were introduced and removed without any public record. The effort default change was documented but framed as a product improvement, never as a regression.
+
+**Post-postmortem issues:** 5 new issues on v2.1.117–119 demonstrate problems beyond the postmortem's scope: subagent model pin ignored ([#52502](https://github.com/anthropics/claude-code/issues/52502) — Haiku pin silently runs Opus, $10.87 vs $0.0005), effort override bypass ([#52534](https://github.com/anthropics/claude-code/issues/52534) — `unpinOpus47LaunchEffort` flag), auto-compact 5x ([#52522](https://github.com/anthropics/claude-code/issues/52522)), self-conversation safety issue ([#52228](https://github.com/anthropics/claude-code/issues/52228)), CLAUDE.md rule violation ([#52652](https://github.com/anthropics/claude-code/issues/52652)). **v2.1.109 recommendation remains valid.** 36 claims cross-checked (28 confirmed, 5 partially confirmed, 3 not relied upon).
 
 ### April 22 — Three-Dataset Cross-Validation: 362K API Calls Converge
 
@@ -125,17 +131,17 @@ Transparent proxy (cc-relay) captured `anthropic-ratelimit-unified-*` headers ac
 
 ---
 
-## Current Status (April 22, 2026 — verified through v2.1.112)
+## Current Status (April 22, 2026 — verified through v2.1.119)
 
 ```mermaid
-pie title Bug Status (12 identified, verified through v2.1.112)
+pie title Bug Status (12 identified, verified through v2.1.119)
     "Fixed (B1, B2)" : 2
     "Unfixed (B3-B5, B8-B11, B8a)" : 8
     "Possibly Fixed (B2a)" : 1
     "By Design (Server)" : 1
 ```
 
-Cache regression (v2.1.89) is **fixed** in v2.1.90-91. **Eight client-side bugs remain unfixed through v2.1.112** (latest). B2a (SendMessage resume) **possibly fixed** in v2.1.101 (CLI resume path fixed, SDK path unconfirmed). P3 ("Output efficiency" prompt) **observed removed** (self-verified). Changelog cross-reference: [01_BUGS.md § Changelog Cross-Reference](01_BUGS.md#changelog-cross-reference-v2192v21101).
+Cache regression (v2.1.89) is **fixed** in v2.1.90-91. **Eight client-side bugs remain unfixed through v2.1.119** (latest). B2a (SendMessage resume) **possibly fixed** in v2.1.101 (CLI resume path fixed, SDK path unconfirmed). P3 ("Output efficiency" prompt) **observed removed** (self-verified). Changelog cross-reference: [01_BUGS.md § Changelog Cross-Reference](01_BUGS.md#changelog-cross-reference-v2192v21101).
 
 | Bug | What It Does | Impact | Status | Details |
 |-----|-------------|--------|--------|---------|
@@ -154,7 +160,7 @@ Cache regression (v2.1.89) is **fixed** in v2.1.90-91. **Eight client-side bugs 
 
 ### What You Can Do
 
-1. **Update to v2.1.91+** — fixes the cache regression (worst drain). v2.1.92–108 add no bug fixes for issues tracked here but are safe to use
+1. **Update to v2.1.91+** (cap at **v2.1.109** — see [4.7 advisory](16_OPUS-47-ADVISORY.md)) — fixes the cache regression (worst drain). v2.1.92–109 add no bug fixes for issues tracked here but are safe to use. **Do not upgrade to v2.1.110+** (Opus 4.7 risks)
 2. **npm or standalone — both fine on v2.1.91** (Sentinel gap closed)
 3. **Don't use `--resume` or `--continue`** — replays full context as billable input
 4. **Start fresh sessions periodically** — the 200K tool result cap (B5) silently truncates older results
@@ -233,6 +239,7 @@ She [recommended](https://x.com/lydiahallie/status/2039800718371307603) using So
 
 | File | What | Updated |
 |------|------|---------|
+| **[17_OPUS-47-POSTMORTEM-ANALYSIS.md](17_OPUS-47-POSTMORTEM-ANALYSIS.md)** | Postmortem cross-check: CHANGELOG transparency analysis, post-postmortem issues (v2.1.116+), effort 48-day Pro/Max gap, 36-claim verification matrix | Apr 24 |
 | **[01_BUGS.md](01_BUGS.md)** | All 11 bugs (B1-B11, B2a, B8a) + 3 preliminary (P1-P3, P4 removed) + changelog cross-reference (v2.1.92-108) | Apr 15 |
 | **[09_QUICKSTART.md](09_QUICKSTART.md)** | Quick fix guide — Option A (v2.1.91+) vs Option B (v2.1.63 downgrade), npm vs standalone, diagnosis | Apr 9 |
 | **[07_TIMELINE.md](07_TIMELINE.md)** | 14-month chronicle (Phase 1-9) + April 6-9 community acceleration + Anthropic response | Apr 9 |
@@ -255,10 +262,10 @@ She [recommended](https://x.com/lydiahallie/status/2039800718371307603) using So
   - **Plan:** Max 20 ($200/mo)
   - **OS:** Linux (Ubuntu), Linux workstation (ubuntu-1)
   - **CC mode:** native `~/.claude` (CC stock, no flag overrides or other instrumentation)
-  - **Versions tested:** v2.1.91 (benchmark), v2.1.90, v2.1.89, v2.1.68. Changelog verified through **v2.1.112**
+  - **Versions tested:** v2.1.91 (benchmark), v2.1.90, v2.1.89, v2.1.68. Changelog verified through **v2.1.119**
   - **Monitoring:** cc-relay v2 transparent proxy — **45,884 total requests across 320 sessions (April 1–22)**
 - **Parallel datasets (tracked separately, see [14_DATA-SOURCES.md](14_DATA-SOURCES.md)):** `ubuntu-1-override` (same machine/account, isolated override environment with a GrowthBook flag override active since April 10 — additional components kept private), `win-1-stock` (Windows 11, Max 5x — research/validation only, not used for the main published analysis)
-- **Date:** April 22, 2026
+- **Date:** April 24, 2026
 
 ---
 
